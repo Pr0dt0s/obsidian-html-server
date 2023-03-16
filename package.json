@@ -1,24 +1,35 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
-	"main": "main.js",
-	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT",
-	"devDependencies": {
-		"@types/node": "^16.11.6",
-		"@typescript-eslint/eslint-plugin": "5.29.0",
-		"@typescript-eslint/parser": "5.29.0",
-		"builtin-modules": "3.3.0",
-		"esbuild": "0.17.3",
-		"obsidian": "latest",
-		"tslib": "2.4.0",
-		"typescript": "4.7.4"
-	}
+  "name": "obsidian-sample-plugin",
+  "version": "1.0.0",
+  "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+  "main": "main.js",
+  "scripts": {
+    "copy-mainjs": "node ./scripts/copy-mainjs.mjs",
+    "prestart-obsidian": "npm run copy-mainjs",
+    "start-obsidian": "node ./scripts/start-obsidian.mjs",
+    "dev": "tsc-watch --noClear -p ./tsconfig.dev.json --onSuccess \"npm run copy-mainjs\"",
+    "dev:full": "tsc-watch --noClear -p ./tsconfig.dev.json --onSuccess \"npm run start-obsidian\"",
+    "build": "tsc",
+    "version": "node version-bump.mjs && git add manifest.json versions.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16",
+    "@types/node-ipc": "^9.2.0",
+    "@typescript-eslint/eslint-plugin": "^5.55.0",
+    "@typescript-eslint/parser": "^5.55.0",
+    "builtin-modules": "3.3.0",
+    "dotenv": "^16.0.3",
+    "esbuild": "^0.17.11",
+    "eslint": "^8.36.0",
+    "nodemon": "^2.0.21",
+    "node-ipc": "^11.1.0",
+    "obsidian": "latest",
+    "prettier": "^2.8.4",
+    "tsc-watch": "^6.0.0",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5"
+  }
 }
