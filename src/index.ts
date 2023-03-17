@@ -1,7 +1,7 @@
 // import * as http from "http";
-import { App, Plugin, PluginManifest } from "obsidian";
+import { App, Plugin, PluginManifest } from 'obsidian';
 /** @type { import('express') } */
-import express from "express";
+import express from 'express';
 
 // Remember to rename these classes and interfaces!
 interface MyPluginSettings {
@@ -9,7 +9,7 @@ interface MyPluginSettings {
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-  mySetting: "default",
+  mySetting: 'default',
 };
 
 export default class MyPlugin extends Plugin {
@@ -22,23 +22,23 @@ export default class MyPlugin extends Plugin {
 
   async onload() {
     await this.loadSettings();
-    console.log("Hello from rollup!");
+    console.log('Hello from rollup!');
 
     const app = express();
 
-    app.use("/", (_req, res) => {
-      console.log("Hit!!!");
-      res.status(200).write("Well, hello there, again...");
+    app.use('/', (_req, res) => {
+      console.log('Hit!!!');
+      res.status(200).write('Well, hello there, again...');
       res.end();
     });
 
     const server = app.listen(8080);
 
     // @ts-ignore
-    window.electron.remote.shell.openExternal("http://localhost:8080");
+    window.electron.remote.shell.openExternal('http://localhost:8080');
 
     this.register(() => {
-      console.log("Closing http server");
+      console.log('Closing http server');
       server.close((err) => {
         console.error(err);
       });
