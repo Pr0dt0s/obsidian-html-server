@@ -1,22 +1,27 @@
 {
   "compilerOptions": {
-    "baseUrl": ".src",
-    "outDir": "./dist",
-    "module": "CommonJS",
-    "target": "ESNext",
+    "baseUrl": "src",
+    "rootDir": "./src/server",
+    "outDir": "./dist/server",
+    "module": "CommonJS" /* Specify what module code is generated. */,
+    "target": "ES2022" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "allowSyntheticDefaultImports": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "moduleDetection": "legacy",
     "allowJs": false,
     "strict": true,
     "removeComments": true,
     "noImplicitAny": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
     "strictNullChecks": true,
-    "lib": ["ES6"]
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
+    "moduleResolution": "node"
+    // "lib": ["ES6", "DOM"]
   },
-  "include": ["server/**/*.ts"],
-  "watchOptions": {
-    "watchDirectory": "usefsevents"
-  },
+  "include": ["src/server/**/*.ts"],
   "buildOptions": {
     "incremental": true
   }

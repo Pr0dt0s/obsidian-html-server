@@ -2,11 +2,11 @@
   "name": "obsidian-sample-plugin",
   "version": "1.0.0",
   "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
-  "main": "main.js",
+  "type": "commonjs",
   "scripts": {
     "start-obsidian": "node ./scripts/start-obsidian.mjs",
     "dev:plugin": "rollup -c -w",
-    "dev:server": "ts-node -p tsconfig.server.json --swc src/server/standalone.ts",
+    "dev:server": "tsc-watch -p tsconfig.server.json --onSuccess \"node ./dist/server/standalone.js\"",
     "build": "rollup -c",
     "version": "node version-bump.mjs && git add manifest.json versions.json"
   },
