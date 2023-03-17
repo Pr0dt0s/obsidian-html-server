@@ -11,6 +11,7 @@
     "moduleResolution": "node",
     "importHelpers": false,
     "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
     "lib": ["DOM", "ES5", "ES6", "ES7"]
   },
