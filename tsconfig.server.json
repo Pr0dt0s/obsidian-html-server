@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".src",
+    "outDir": "./dist",
+    "module": "CommonJS",
+    "target": "ESNext",
+    "allowJs": false,
+    "strict": true,
+    "removeComments": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "strictNullChecks": true,
+    "lib": ["ES6"]
+  },
+  "include": ["server/**/*.ts"],
+  "watchOptions": {
+    "watchDirectory": "usefsevents"
+  },
+  "buildOptions": {
+    "incremental": true
+  }
+}
