@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "outDir": "./dist",
-    "module": "CommonJS",
+    "outDir": "test-vault/.obsidian/plugins/obsidian-html-server",
+    "module": "ESNext",
     "target": "ESNext",
     "allowJs": false,
     "strict": true,

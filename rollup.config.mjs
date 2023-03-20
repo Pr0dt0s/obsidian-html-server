@@ -1,42 +1,54 @@
-import typescript from "@rollup/plugin-typescript";
-import json from "@rollup/plugin-json";
-import terser from "@rollup/plugin-terser";
-import resolve from "rollup-plugin-node-resolve";
-import commonJS from "rollup-plugin-commonjs";
+import json from '@rollup/plugin-json';
+import nodeResolve from '@rollup/plugin-node-resolve';
+import cjs from '@rollup/plugin-commonjs';
+import copy from 'rollup-plugin-copy';
+import typescript from '@rollup/plugin-typescript';
 
-export default {
-  input: "src/index.ts",
-  external: [
-    "obsidian",
-    "path",
-    "util",
-    "tty",
-    "fs",
-    "net",
-    "events",
-    "stream",
-    "zlib",
-    "buffer",
-    "string_decoder",
-    "async_hooks",
-    "querystring",
-    "url",
-    "http",
-    "crypto",
-  ],
+const developmentConfig = {
+  input: 'src/plugin/main.ts',
+  external: ['obsidian'],
   output: {
-    file: "main.js",
-    format: "cjs",
+    dir: 'test-vault/.obsidian/plugins/obsidian-html-server',
+    sourcemap: 'inline',
+    format: 'cjs',
+    exports: 'default',
+    name: 'Html Server',
   },
   plugins: [
     json(),
-    resolve({
-      preferBuiltins: true,
+    nodeResolve({ preferBuiltins: true }),
+    cjs({ include: 'node_modules/**' }),
+    typescript({ tsconfig: 'tsconfig.dev.json' }),
+    copy({
+      targets: [
+        {
+          src: 'manifest.json',
+          dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
+        },
+      ],
     }),
-    commonJS({
-      include: "node_modules/**",
-    }),
-    typescript(),
-    terser(),
   ],
 };
+
+const productionConfig = {
+  input: 'src/plugin/main.ts',
+  external: ['obsidian'],
+  output: {
+    dir: 'dist',
+    sourcemap: 'inline',
+    sourcemapExcludeSources: true,
+    format: 'cjs',
+    exports: 'default',
+    name: 'Html Server',
+  },
+  plugins: [
+    json(),
+    nodeResolve({ preferBuiltins: true }),
+    cjs({ include: 'node_modules/**' }),
+    typescript({ tsconfig: 'tsconfig.json' }),
+  ],
+};
+
+const config =
+  process.env.PRODUCTION === '1' ? productionConfig : developmentConfig;
+export default config;
