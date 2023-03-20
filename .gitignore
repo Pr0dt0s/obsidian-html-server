@@ -5,9 +5,11 @@ node_modules
 # They should be uploaded to GitHub releases instead.
 main.js
 dist
+# obsidian
+data.json
 
 # Exclude sourcemaps
 *.map
 
-# obsidian
-data.json
+test-vault/.obsidian/plugins/obsidian-html-server/*
+!test-vault/.obsidian/plugins/obsidian-html-server/.hotreload

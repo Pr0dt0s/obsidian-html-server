@@ -1,0 +1,10 @@
+{
+  "accentColor": "",
+  "theme": "obsidian",
+  "cssTheme": "Obsidianite",
+  "nativeMenus": false,
+  "translucency": false,
+  "enabledCssSnippets": [
+    "test1"
+  ]
+}
