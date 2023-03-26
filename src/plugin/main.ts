@@ -87,7 +87,7 @@ export default class HtmlServerPlugin extends Plugin {
               h < p.length;
               h++
             ) {
-              let d = (0, p[h])(r, t);
+              let d = p[h](r, t);
               d && d.then && i.push(d);
             }
             let f = FB(t.containerEl),
