@@ -7,4 +7,8 @@ declare module 'obsidian' {
       callback: (data: { isServerRunning: boolean }) => void
     ): EventRef;
   }
+
+  interface DataAdapter {
+    basePath: string;
+  }
 }

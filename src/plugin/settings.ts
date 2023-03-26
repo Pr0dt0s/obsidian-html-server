@@ -33,6 +33,20 @@ export const DEFAULT_SETTINGS: PluginSettings = {
               <div class="workspace-leaf">
                 <div class="workspace-leaf-content" data-type="markdown" data-mode="preview">
                   <div class="view-content">
+                    <div class="markdown-reading-view" style="width: 100%; height: 100%;">
+                      <div
+                        class="markdown-preview-view markdown-rendered node-insert-event is-readable-line-width allow-fold-headings show-indentation-guide allow-fold-lists"
+                        tabindex="-1" style="tab-size: 4;">
+                        <div class="markdown-preview-sizer markdown-preview-section" style="padding-bottom: 369px; min-height: 1158px;">
+                          <div class="markdown-preview-pusher" style="width: 1px; height: 0.1px; margin-bottom: 0px;"></div>
+                          <div class="mod-header">
+                            <div class="inline-title" contenteditable="true" spellcheck="false" tabindex="-1" enterkeyhint="done">#VAR{RENDERED_CONTENT_FILE_NAME}
+                            </div>
+                            #VAR{RENDERED_CONTENT}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
