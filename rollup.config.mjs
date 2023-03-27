@@ -9,7 +9,7 @@ const developmentConfig = {
   external: ['obsidian'],
   output: {
     dir: 'test-vault/.obsidian/plugins/obsidian-html-server',
-    sourcemap: 'inline',
+    sourcemap: false,
     format: 'cjs',
     exports: 'default',
     name: 'Html Server',
