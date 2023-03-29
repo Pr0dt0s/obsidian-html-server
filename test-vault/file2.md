@@ -1,6 +1,6 @@
 ## Example markdown file # 2
 
-![[Pasted image 20230320190050.png]]
+![[img.png]]
 
 ![[file1]]
 

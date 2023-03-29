@@ -9,7 +9,7 @@
 
 
 [[file2]]
-![[Pasted image 20230320190050.png]]
+![[img.png]]
 #### Project Milestones:
 
 [[file2#^e01ace]]
