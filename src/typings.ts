@@ -1,10 +1,15 @@
 import 'obsidian';
+import { PluginSettings } from 'plugin/settings';
 
 declare module 'obsidian' {
   interface Workspace {
     on(
       name: 'html-server-event',
       callback: (data: { isServerRunning: boolean }) => void
+    ): EventRef;
+    on(
+      name: 'html-server-settings-change',
+      callback: (settings: PluginSettings) => void
     ): EventRef;
   }
 

@@ -3,15 +3,19 @@ import { IncomingMessage, Server, ServerResponse } from 'http';
 import { Component, MarkdownRenderer } from 'obsidian';
 import path from 'path';
 import HtmlServerPlugin from './main';
-import mime, { contentType } from 'mime-types';
-import { readFile } from 'fs/promises';
+import mime from 'mime-types';
+import { CustomMarkdownRenderer } from './markdownRenderer/customMarkdownRenderer';
+import { ObsidianMarkdownRenderer } from './markdownRenderer/obsidianMarkdownRenderer';
 
 export class ServerController {
   app: express.Application;
   server?: Server<typeof IncomingMessage, typeof ServerResponse>;
+  markdownRenderer: CustomMarkdownRenderer;
 
   constructor(private plugin: HtmlServerPlugin) {
     this.app = express();
+
+    this.markdownRenderer = new ObsidianMarkdownRenderer(plugin, plugin.app);
 
     this.app.use('/', async (req, res) => {
       const r = await this.createFileResolver()(decodeURI(req.path));
@@ -80,9 +84,7 @@ export class ServerController {
       )
       .join('\n');
 
-    const tryResolveFile: (
-      requestedUrl: string
-    ) => Promise<{
+    const tryResolveFile: (requestedUrl: string) => Promise<{
       contentType: string;
       payload: string | Buffer;
     } | null> = async (requestedUrl: string) => {
@@ -141,25 +143,23 @@ export class ServerController {
                 },
                 {
                   varName: 'RENDERED_CONTENT',
-                  varValue: rendererDiv.innerHTML,
+                  varValue: await this.markdownRenderer.renderHtmlFromMarkdown(
+                    markdown
+                  ),
                 },
+                // {
+                //   varName: 'RENDERED_CONTENT',
+                //   varValue: rendererDiv.innerHTML,
+                // },
               ]
             ),
           };
         } else if (requestedFile) {
-          // const payload = await requestedFile.vault.read(requestedFile);
-          // console.log(Buffer.from(payload));
-
-          const payload = await readFile(
-            path.join(
-              this.plugin.app.vault.adapter.basePath,
-              '/' + requestedFile.path
-            )
-          );
+          const payload = await this.plugin.app.vault.readBinary(requestedFile);
 
           return {
             contentType: mime.lookup(requestedFile.extension) || 'text',
-            payload,
+            payload: Buffer.from(payload),
           };
         }
       }
