@@ -11,5 +11,6 @@ data.json
 # Exclude sourcemaps
 *.map
 
+test-vault/.obsidian/workspace.json
 test-vault/.obsidian/plugins/obsidian-html-server/*
 !test-vault/.obsidian/plugins/obsidian-html-server/.hotreload
