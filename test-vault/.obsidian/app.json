@@ -1,4 +1,5 @@
 {
   "defaultViewMode": "preview",
-  "showInlineTitle": true
+  "showInlineTitle": true,
+  "livePreview": false
 }
