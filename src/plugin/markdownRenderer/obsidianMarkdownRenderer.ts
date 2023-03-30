@@ -3,7 +3,7 @@ import {
   MarkdownPreviewRenderer,
   MarkdownView,
   WorkspaceLeaf,
-} from 'obsidian';
+} from 'typings';
 import HtmlServerPlugin from 'plugin/main';
 import { CustomMarkdownRenderer } from './customMarkdownRenderer';
 
@@ -66,7 +66,7 @@ export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
     return maybe;
   }
 
-  async renderHtmlFromMarkdown(_markdown: string): Promise<string> {
+  async renderHtmlFromMarkdown(markdown: string): Promise<string> {
     // Create New Leaf
     //@ts-ignore
     const leaf = new WorkspaceLeaf(this.app);
@@ -83,26 +83,49 @@ export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
       view.currentMode.onRenderComplete = () => {
         if (view.currentMode.renderer.queued) return;
 
+        this.postProcess(view.currentMode.renderer.previewEl);
+
         const html = view.currentMode.renderer.previewEl.innerHTML;
-        view.currentMode.renderer.previewEl.detach();
-        console.log(html);
+        // view.currentMode.renderer.previewEl.detach();
 
-        view.currentMode.onRenderComplete = () => {};
+        // view.currentMode.onRenderComplete = () => {};
 
-        leaf.detach();
+        // leaf.detach();
         resolve(html);
       };
     });
 
-    view.currentMode.renderer.set(`## Example markdown file # 2
-    
-![[img.png]]
-
-![[file1]]
-
-asdasd
-`);
+    view.currentMode.renderer.set(markdown);
 
     return renderedPromise;
+  }
+
+  private postProcess(el: Element) {
+    const links = el.querySelectorAll<HTMLAnchorElement>('a.internal-link');
+
+    links.forEach((link) => {
+      link.target = '';
+    });
+
+    const embeds = el.querySelectorAll<HTMLSpanElement>(
+      'span.internal-embed.markdown-embed.inline-embed'
+    );
+
+    embeds.forEach((embed) => {
+      if (embed.parentElement && embed.parentElement.parentElement) {
+        embed.parentElement.parentElement.style.position = 'relative';
+      }
+      //TODO: change link to anchor
+    });
+
+    const imagesContainers = el.querySelectorAll<HTMLDivElement>(
+      '.internal-embed.media-embed.image-embed'
+    );
+
+    imagesContainers.forEach((imageContainer) => {
+      const src = imageContainer.getAttribute('src') || '';
+      const imageElement = imageContainer.querySelector('img');
+      if (imageElement) imageElement.src = src;
+    });
   }
 }

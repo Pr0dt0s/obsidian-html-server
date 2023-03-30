@@ -1,4 +1,4 @@
-import { Plugin } from 'obsidian';
+import { Plugin } from 'typings';
 import { PluginSettings, DEFAULT_SETTINGS } from './settings';
 import { ServerController } from './serverController';
 import { setupUiElements } from './uiSetup';

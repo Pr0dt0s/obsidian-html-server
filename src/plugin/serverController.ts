@@ -1,7 +1,5 @@
 import express from 'express';
 import { IncomingMessage, Server, ServerResponse } from 'http';
-import { Component, MarkdownRenderer } from 'obsidian';
-import path from 'path';
 import HtmlServerPlugin from './main';
 import mime from 'mime-types';
 import { CustomMarkdownRenderer } from './markdownRenderer/customMarkdownRenderer';
@@ -25,9 +23,7 @@ export class ServerController {
         res.end();
         return;
       }
-      console.log(r.contentType);
       res.contentType(r.contentType);
-      console.log(res.charset);
       res.write(r.payload);
       res.end();
     });
@@ -47,6 +43,7 @@ export class ServerController {
               resolve(server);
             }
           );
+          console.log('Server Started!');
         } catch (error) {
           console.error('error trying to start the server', error);
           resolve(undefined);
@@ -71,6 +68,7 @@ export class ServerController {
     if (!this.isRunning()) return;
     await this.stop();
     await this.start();
+    console.log('Server Restarted!');
   }
 
   isRunning() {
@@ -118,19 +116,21 @@ export class ServerController {
         };
       } else {
         const requestedFile = this.plugin.app.vault.getFiles().find((file) => {
-          console.log(file.path);
-          return '/' + file.path == requestedUrl;
+          return (
+            '/' + file.path == requestedUrl ||
+            '/' + file.path == requestedUrl + '.md'
+          );
         });
         if (requestedFile?.extension && requestedFile.extension === 'md') {
           const markdown = await requestedFile.vault.read(requestedFile);
-          const rendererDiv = createDiv();
-          const sourcePath = path.dirname('/' + requestedFile.path);
-          await MarkdownRenderer.renderMarkdown(
-            markdown,
-            rendererDiv,
-            sourcePath,
-            new Component()
-          );
+          // const rendererDiv = createDiv();
+          // const sourcePath = path.dirname('/' + requestedFile.path);
+          // await MarkdownRenderer.renderMarkdown(
+          //   markdown,
+          //   rendererDiv,
+          //   sourcePath,
+          //   new Component()
+          // );
           return {
             contentType: 'text/html',
             payload: parseHtmlVariables(

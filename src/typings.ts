@@ -1,5 +1,12 @@
 import 'obsidian';
 import { PluginSettings } from 'plugin/settings';
+export {
+  App,
+  MarkdownPreviewRenderer,
+  MarkdownView,
+  WorkspaceLeaf,
+  Plugin,
+} from 'obsidian';
 
 declare module 'obsidian' {
   interface Workspace {
