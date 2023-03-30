@@ -19,8 +19,8 @@
 - [x] Inline Remote Image
 ![this is a remote image](https://obsidian.md/images/screenshot-1.0-hero-combo.png)
 - [x] Codeblock with Language Sintax
-```javascript
-const test = () => 'Testing Sintax, this is working...';
+```typescript
+const test: () => string = () => 'Testing Sintax, this is working...';
 ```
 - [x] Mermaid Diagram
 ```mermaid
