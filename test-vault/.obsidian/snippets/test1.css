@@ -1,3 +1,6 @@
-h4 {
-  background-color: darkslategrey;
+h1 {
+  text-decoration: var(--text-accent) wavy underline 3px
+}
+h1::before {
+  content: '😎->';
 }
