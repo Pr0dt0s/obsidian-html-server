@@ -4,7 +4,7 @@ This plugin allows you to serve your Obsidian vault as an HTTP server, while mai
 
 ## Usage
 
-Simply enable the plugin and open a web browser at `http://localhost:8080/A_MARKDOWN_FILE` to view the same document you see when opening it in Obsidian.
+Simply enable the plugin, start the server and open a web browser at `http://localhost:8080/A_MARKDOWN_FILE` to view the same document you see when opening it in Obsidian.
 
 ## Notes
 

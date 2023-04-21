@@ -3,6 +3,7 @@ import nodeResolve from '@rollup/plugin-node-resolve';
 import cjs from '@rollup/plugin-commonjs';
 import copy from 'rollup-plugin-copy';
 import typescript from '@rollup/plugin-typescript';
+import terser from '@rollup/plugin-terser';
 
 const developmentConfig = {
   input: 'src/plugin/main.ts',
@@ -35,7 +36,7 @@ const productionConfig = {
   external: ['obsidian'],
   output: {
     dir: 'dist',
-    sourcemap: 'inline',
+    sourcemap: false,
     sourcemapExcludeSources: true,
     format: 'cjs',
     exports: 'default',
@@ -46,6 +47,15 @@ const productionConfig = {
     nodeResolve({ preferBuiltins: true }),
     cjs({ include: 'node_modules/**' }),
     typescript({ tsconfig: 'tsconfig.json' }),
+    copy({
+      targets: [
+        {
+          src: 'manifest.json',
+          dest: 'dist/',
+        },
+      ],
+    }),
+    terser({ compress: true, mangle: true }),
   ],
 };
 
