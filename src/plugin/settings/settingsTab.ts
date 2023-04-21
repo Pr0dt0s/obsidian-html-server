@@ -2,6 +2,7 @@ import { App, PluginSettingTab, Setting } from 'typings';
 import HtmlServerPlugin from '../main';
 import * as obsidian from 'obsidian';
 import { DEFAULT_SETTINGS, PluginSettings } from './settings';
+import { FileSuggest } from './suggester/FileSuggester';
 
 export class HtmlServerPluginSettingsTab extends PluginSettingTab {
   constructor(app: App, private plugin: HtmlServerPlugin) {
@@ -82,6 +83,21 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
         await this.saveAndReload();
       });
     });
+
+    new Setting(containerEl)
+      .setName('Index File.')
+      .setDesc(
+        'File to render initially, i.e. when no file is being requested.'
+      )
+      .addSearch((cb) => {
+        new FileSuggest(cb.inputEl);
+        cb.setValue(this.plugin.settings.defaultFile);
+        cb.onChange(async (value) => {
+          value ? advancedSettings.show() : advancedSettings.hide();
+          this.plugin.settings.defaultFile = value;
+          await this.saveAndReload();
+        });
+      });
 
     new Setting(containerEl)
       .setName('Show Advanced Settings.')
@@ -210,8 +226,10 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
         cb.setTooltip('Restore Default Values');
         cb.onClick(() => {
           const modal = new obsidian.Modal(app);
-          modal.titleEl.setText(
-            'Are you sure you want to restore the default values?<br>Will restore only the default vars, i.e. not deleting any custom variables.'
+          modal.titleEl.append(
+            'Are you sure you want to restore the default values?',
+            document.createElement('br'),
+            'Will restore only the default vars, i.e. not deleting any custom variables.'
           );
           new Setting(modal.contentEl)
             .addButton((cb) => {
@@ -395,14 +413,29 @@ function setVars(
     line.addExtraButton((cb) => {
       cb.setIcon('x');
       cb.setTooltip('Delete Variable');
-      cb.onClick(() => {
+      cb.onClick(async () => {
         pluggin.settings.htmlReplaceableVariables =
           pluggin.settings.htmlReplaceableVariables.filter(
             (_, i) => i !== index
           );
-        pluggin.saveSettings();
+        await pluggin.saveSettings();
         setVars(element, pluggin, onChange);
       });
+    });
+  });
+
+  new Setting(element).addExtraButton((cb) => {
+    cb.setIcon('add');
+    cb.extraSettingsEl.innerText = 'Add a new Variable';
+    cb.setTooltip('Add a new Variable');
+    cb.extraSettingsEl.style.backgroundColor = '--var(--success)';
+    cb.onClick(async () => {
+      pluggin.settings.htmlReplaceableVariables.push({
+        varName: '',
+        varValue: '',
+      });
+      await pluggin.saveSettings();
+      setVars(element, pluggin, onChange);
     });
   });
 }

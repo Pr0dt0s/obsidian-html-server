@@ -1,5 +1,6 @@
 export type PluginSettings = {
   port: number;
+  defaultFile: string;
   hostname: string;
   startOnLoad: boolean;
   useRibbonButons: boolean;
@@ -11,6 +12,7 @@ export type PluginSettings = {
 export const DEFAULT_SETTINGS: PluginSettings = {
   port: 8080,
   hostname: '0.0.0.0',
+  defaultFile: '',
   startOnLoad: false,
   useRibbonButons: true,
   indexHtml: `<html>

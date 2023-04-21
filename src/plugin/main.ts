@@ -31,6 +31,28 @@ export default class HtmlServerPlugin extends Plugin {
         isServerRunning: false,
       });
     }
+
+    this.addCommand({
+      id: 'start-server',
+      name: 'Start the Web Server',
+      checkCallback: (checking) => {
+        if (checking) {
+          return !this.serverController?.isRunning();
+        }
+        this.startServer();
+      },
+    });
+
+    this.addCommand({
+      id: 'stop-server',
+      name: 'Stop the Web Server',
+      checkCallback: (checking) => {
+        if (checking) {
+          return !!this.serverController?.isRunning();
+        }
+        this.stopServer();
+      },
+    });
   }
 
   async onunload() {

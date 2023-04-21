@@ -16,13 +16,22 @@ export class ServerController {
     this.markdownRenderer = new ObsidianMarkdownRenderer(plugin, plugin.app);
 
     this.app.use('/', async (req, res) => {
-      const r = await this.createFileResolver()(decodeURI(req.path));
+      let path = req.path;
+      if (!path || path === '/') {
+        path = '/' + plugin.settings.defaultFile;
+        console.log(plugin.settings.defaultFile);
+      }
+
+      const r = await this.createFileResolver()(decodeURI(path));
+
+      console.log(r);
 
       if (!r) {
         res.status(404).write(`Couldn't resolve file at path '${req.path}'`);
         res.end();
         return;
       }
+
       res.contentType(r.contentType);
       res.write(r.payload);
       res.end();
@@ -57,7 +66,6 @@ export class ServerController {
       await new Promise<void>((resolve) => {
         this.server?.close((err) => {
           err && console.error(err);
-          console.log('Server Stopped!');
           resolve();
         });
       });
@@ -68,7 +76,6 @@ export class ServerController {
     if (!this.isRunning()) return;
     await this.stop();
     await this.start();
-    console.log('Server Restarted!');
   }
 
   isRunning() {
@@ -131,14 +138,7 @@ export class ServerController {
         });
         if (requestedFile?.extension && requestedFile.extension === 'md') {
           const markdown = await requestedFile.vault.read(requestedFile);
-          // const rendererDiv = createDiv();
-          // const sourcePath = path.dirname('/' + requestedFile.path);
-          // await MarkdownRenderer.renderMarkdown(
-          //   markdown,
-          //   rendererDiv,
-          //   sourcePath,
-          //   new Component()
-          // );
+
           return {
             contentType: 'text/html',
             payload: parseHtmlVariables(
@@ -161,10 +161,6 @@ export class ServerController {
                     ? 'theme-dark'
                     : 'theme-light',
                 },
-                // {
-                //   varName: 'RENDERED_CONTENT',
-                //   varValue: rendererDiv.innerHTML,
-                // },
               ]
             ),
           };
@@ -250,7 +246,6 @@ export function renderFileInBrowserWindow(requestedUrl: string) {
       //@ts-ignore
       electron.remote.ipcMain.on('test', eventListener);
 
-      console.log('Requesting url app:obsidian.md' + requestedUrl);
       //@ts-ignore
       bw.loadURL('app:obsidian.md' + requestedUrl).then(() => {
         //@ts-ignore
