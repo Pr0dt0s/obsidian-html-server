@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "outDir": "./dist",
-    "module": "CommonJS",
+    "outDir": "test-vault/.obsidian/plugins/obsidian-html-server",
+    "module": "ESNext",
     "target": "ESNext",
     "allowJs": false,
     "strict": true,
@@ -11,6 +11,7 @@
     "moduleResolution": "node",
     "importHelpers": false,
     "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
     "lib": ["DOM", "ES5", "ES6", "ES7"]
   },

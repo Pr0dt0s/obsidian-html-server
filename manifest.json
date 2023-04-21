@@ -3,9 +3,12 @@
   "name": "Obsidian Html Server",
   "version": "1.0.0",
   "minAppVersion": "0.15.0",
-  "description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-  "author": "Obsidian",
-  "authorUrl": "https://obsidian.md",
-  "fundingUrl": "https://obsidian.md/pricing",
-  "isDesktopOnly": false
+  "description": "This plugin lets you spin up a local http server to access your vault via a web browser from any device in your network.",
+  "author": "Pr0dt0s",
+  "authorUrl": "https://github.com/Pr0dt0s",
+  "fundingUrl": {
+    "Buy Me a Coffee": "https://www.buymeacoffee.com/pr0dt0s",
+    "Paypal": "https://www.paypal.com/donate/?business=JGQK6YQBWZJ4A&currency_code=USD"
+  },
+  "isDesktopOnly": true
 }
