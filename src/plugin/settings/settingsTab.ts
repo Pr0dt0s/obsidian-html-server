@@ -326,6 +326,33 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
       href: 'https://github.com/Pr0dt0s/obsidian-html-server',
     });
     div2.appendText('.');
+
+    const donateEl = new Setting(this.containerEl)
+      .setName('Donate')
+      .setDesc(
+        'If you like this Plugin, consider donating to support continued development.'
+      );
+
+    const github = document.createElement('a');
+    github.setAttribute('href', 'https://github.com/sponsors/Pr0dt0s');
+    github.addClass('templater_donating');
+    const img1 = document.createElement('img');
+    img1.src =
+      'https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86';
+    github.appendChild(img1);
+
+    const paypal = document.createElement('a');
+    paypal.setAttribute(
+      'href',
+      'https://www.paypal.com/donate/?business=JGQK6YQBWZJ4A&currency_code=USD'
+    );
+    paypal.addClass('templater_donating');
+    const img2 = document.createElement('img');
+    img2.src = 'https://img.shields.io/badge/paypal-Pr0dt0s-blue?logo=paypal';
+    paypal.appendChild(img2);
+
+    donateEl.settingEl.appendChild(github);
+    donateEl.settingEl.appendChild(paypal);
   }
 }
 
@@ -424,11 +451,11 @@ function setVars(
     });
   });
 
-  new Setting(element).addExtraButton((cb) => {
-    cb.setIcon('add');
-    cb.extraSettingsEl.innerText = 'Add a new Variable';
+  new Setting(element).addButton((cb) => {
+    cb.setIcon('plus');
+    cb.setCta();
+    cb.setButtonText('Add a new Variable');
     cb.setTooltip('Add a new Variable');
-    cb.extraSettingsEl.style.backgroundColor = '--var(--success)';
     cb.onClick(async () => {
       pluggin.settings.htmlReplaceableVariables.push({
         varName: '',
