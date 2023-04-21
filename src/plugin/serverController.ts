@@ -76,11 +76,13 @@ export class ServerController {
   }
 
   createFileResolver() {
-    const fullCssText = Array.from(document.styleSheets)
-      .flatMap((styleSheet) =>
-        Array.from(styleSheet.cssRules).map((cssRule) => cssRule.cssText)
-      )
-      .join('\n');
+    const fullCssText =
+      Array.from(document.styleSheets)
+        .flatMap((styleSheet) =>
+          Array.from(styleSheet.cssRules).map((cssRule) => cssRule.cssText)
+        )
+        .join('\n') +
+      `\n.markdown-preview-view, .markdown-embed-content {height: unset !important;}`;
 
     const tryResolveFile: (requestedUrl: string) => Promise<{
       contentType: string;
@@ -98,7 +100,7 @@ export class ServerController {
         const data = parseHtmlVariables(
           this.plugin.settings.indexHtml || '<html></html>',
           [
-            ...this.plugin.settings.htmlVariables,
+            ...this.plugin.settings.htmlReplaceableVariables,
             {
               varName: 'RENDERED_CONTENT_FILE_NAME',
               varValue: 'No file loaded...',
@@ -106,6 +108,12 @@ export class ServerController {
             {
               varName: 'RENDERED_CONTENT',
               varValue: '',
+            },
+            {
+              varName: 'THEME_MODE',
+              varValue: document.body.classList.contains('theme-dark')
+                ? 'theme-dark'
+                : 'theme-light',
             },
           ]
         );
@@ -136,7 +144,7 @@ export class ServerController {
             payload: parseHtmlVariables(
               this.plugin.settings.indexHtml || '<html></html>',
               [
-                ...this.plugin.settings.htmlVariables,
+                ...this.plugin.settings.htmlReplaceableVariables,
                 {
                   varName: 'RENDERED_CONTENT_FILE_NAME',
                   varValue: requestedFile.basename,
@@ -146,6 +154,12 @@ export class ServerController {
                   varValue: await this.markdownRenderer.renderHtmlFromMarkdown(
                     markdown
                   ),
+                },
+                {
+                  varName: 'THEME_MODE',
+                  varValue: document.body.classList.contains('theme-dark')
+                    ? 'theme-dark'
+                    : 'theme-light',
                 },
                 // {
                 //   varName: 'RENDERED_CONTENT',

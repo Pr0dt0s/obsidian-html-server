@@ -2,11 +2,12 @@ import { Notice } from 'obsidian';
 import HtmlServerPlugin from './main';
 
 const addRibbonButtons = (plugin: HtmlServerPlugin) => {
-  if (!plugin.settings.useRibbonButon) {
+  if (!plugin.settings.useRibbonButons) {
     console.log('Ribbon Buttons disabled');
-    return;
+    return () => {};
   }
   console.log('Setting up Ui elements (Ribbon Buttons)');
+
   const startButton = plugin.addRibbonIcon(
     'wifi-off',
     'Turn Http Server On',
@@ -36,7 +37,11 @@ const addRibbonButtons = (plugin: HtmlServerPlugin) => {
   stopButton.style.color = 'var(--text-accent)';
   stopButton.style.opacity = '0.95';
 
-  plugin.app.workspace.on('html-server-event', ({ isServerRunning }) => {
+  const changeButtonsState = ({
+    isServerRunning,
+  }: {
+    isServerRunning: boolean;
+  }) => {
     if (isServerRunning) {
       startButton.hide();
       stopButton.show();
@@ -44,6 +49,12 @@ const addRibbonButtons = (plugin: HtmlServerPlugin) => {
       startButton.show();
       stopButton.hide();
     }
+  };
+
+  plugin.app.workspace.on('html-server-event', changeButtonsState);
+
+  changeButtonsState({
+    isServerRunning: !!plugin.serverController?.isRunning(),
   });
 
   const clearRibbonButtons = () => {
@@ -60,7 +71,11 @@ export const setupUiElements = (plugin: HtmlServerPlugin) => {
   // const statusBarItem = plugin.addStatusBarItem();
 
   // plugin.removeChild()
-  addRibbonButtons(plugin);
+  const clearRibbonButtons = addRibbonButtons(plugin);
+
+  return {
+    clearRibbonButtons,
+  };
 
   // statusBarItem.createSvg('svg', '');
   // plugin.registerEvent(plugin.emitter.on('server-running', () => {}));

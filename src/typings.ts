@@ -1,7 +1,9 @@
 import 'obsidian';
-import { PluginSettings } from 'plugin/settings';
+import { PluginSettings } from 'plugin/settings/settings';
 export {
   App,
+  PluginSettingTab,
+  Setting,
   MarkdownPreviewRenderer,
   MarkdownView,
   WorkspaceLeaf,
@@ -9,6 +11,13 @@ export {
 } from 'obsidian';
 
 declare module 'obsidian' {
+  interface App {
+    plugins: {
+      disablePlugin: (id: string) => Promise<void>;
+      enablePlugin: (id: string) => Promise<void>;
+    };
+  }
+
   interface Workspace {
     on(
       name: 'html-server-event',

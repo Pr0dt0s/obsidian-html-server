@@ -1,4 +1,5 @@
 [
   "obsidian-html-server",
-  "hot-reload"
+  "hot-reload",
+  "templater-obsidian"
 ]

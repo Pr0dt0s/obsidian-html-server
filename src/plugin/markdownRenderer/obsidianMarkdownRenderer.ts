@@ -78,10 +78,73 @@ export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
     leaf.view = view;
 
     view.currentMode.type = 'preview';
+    let n = 0;
 
     const renderedPromise = new Promise<string>((resolve, _reject) => {
       view.currentMode.onRenderComplete = () => {
-        if (view.currentMode.renderer.queued) return;
+        console.log(`${n} renderComplete`);
+        if (view.currentMode.renderer.queued) {
+          return;
+        }
+        if (!n++) {
+          const callouts =
+            view.currentMode.renderer.previewEl.querySelectorAll(
+              '.callout-icon svg'
+            );
+          callouts.forEach((el) => {
+            el.parentElement?.removeChild(el);
+          });
+          //@ts-ignore
+          view.currentMode.renderer.sections.forEach((section) => {
+            const promisses: Promise<void>[] = [];
+            //@ts-ignore
+            view.currentMode.renderer.owner.postProcess(
+              section,
+              promisses,
+              //@ts-ignore
+              view.currentMode.renderer.frontmatter
+            );
+            if (promisses.length) {
+              //@ts-ignore
+              view.currentMode.renderer.asyncSections.push(section);
+              Promise.all(promisses).then(function () {
+                //@ts-ignore
+                view.currentMode.renderer.asyncSections.remove(section),
+                  section.resetCompute(),
+                  view.currentMode.renderer.queueRender();
+              });
+            }
+            // view.currentMode.renderer.onRenderComplete(); // Force a rerender to update everithing that needs css (callout-icons, etc?)
+          });
+          view.currentMode.renderer.onRender(); // Force a rerender to update everithing that needs css (callout-icons, etc?)
+          return;
+        }
+        // if (n++ < 11) {
+        //   //@ts-ignore
+        //   // view.currentMode.renderer.owner.onRenderComplete();
+        // view.currentMode.renderer.sections.forEach((section) => {
+        //   const promisses: Promise<void>[] = [];
+        //   //@ts-ignore
+        //   view.currentMode.renderer.owner.postProcess(
+        //     section,
+        //     promisses,
+        //     //@ts-ignore
+        //     view.currentMode.renderer.frontmatter
+        //   );
+        //   if (promisses.length) {
+        //     //@ts-ignore
+        //     view.currentMode.renderer.asyncSections.push(section);
+        //     Promise.all(promisses).then(function () {
+        //       //@ts-ignore
+        //       view.currentMode.renderer.asyncSections.remove(section),
+        //         section.resetCompute(),
+        //         view.currentMode.renderer.queueRender();
+        //     });
+        //   }
+        //   // view.currentMode.renderer.onRenderComplete(); // Force a rerender to update everithing that needs css (callout-icons, etc?)
+        // });
+        // return;
+        // }
 
         this.postProcess(view.currentMode.renderer.previewEl);
 
@@ -127,5 +190,11 @@ export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
       const imageElement = imageContainer.querySelector('img');
       if (imageElement) imageElement.src = src;
     });
+
+    const callouts = el.querySelectorAll('.callout');
+    callouts.forEach((callout) => {
+      console.log(callout);
+    });
+    console.log(callouts.length);
   }
 }

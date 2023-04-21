@@ -2,16 +2,17 @@ export type PluginSettings = {
   port: number;
   hostname: string;
   startOnLoad: boolean;
-  useRibbonButon: boolean;
+  useRibbonButons: boolean;
   indexHtml: string;
-  htmlVariables: { varName: string; varValue: string }[];
+  htmlReplaceableVariables: { varName: string; varValue: string }[];
+  showAdvancedOptions: boolean;
 };
 
 export const DEFAULT_SETTINGS: PluginSettings = {
   port: 8080,
-  hostname: 'localhost',
+  hostname: '0.0.0.0',
   startOnLoad: false,
-  useRibbonButon: true,
+  useRibbonButons: true,
   indexHtml: `<html>
 <head>
   <meta charset="utf-8">
@@ -22,7 +23,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   <link href="#VAR{CSS_FILE_URL}" type="text/css" rel="stylesheet">
 </head>
 <body
-  class="theme-dark mod-windows is-frameless is-maximized is-hidden-frameless obsidian-app show-inline-title show-view-header"
+  class="#VAR{THEME_MODE} mod-windows is-frameless is-maximized is-hidden-frameless obsidian-app show-inline-title show-view-header"
   style="--zoom-factor:1; --font-text-size:16px;">
   <div class="app-container">
     <div class="horizontal-main-container">
@@ -58,7 +59,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   </div>
 </body>
 </html>`,
-  htmlVariables: [
+  htmlReplaceableVariables: [
     {
       varName: 'HTML_TITLE',
       varValue: 'Obsidian Html Server',
@@ -72,4 +73,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
       varValue: '/.obsidian/plugins/obsidian-http-server/app.css',
     },
   ],
+  showAdvancedOptions: false,
 };

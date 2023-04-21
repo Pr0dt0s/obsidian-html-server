@@ -1,13 +1,15 @@
 import { Plugin } from 'typings';
-import { PluginSettings, DEFAULT_SETTINGS } from './settings';
+import { PluginSettings, DEFAULT_SETTINGS } from './settings/settings';
 import { ServerController } from './serverController';
 import { setupUiElements } from './uiSetup';
-import { HtmlServerSettingsTab as HtmlServerPluginSettingsTab } from './settingsTab';
+import { HtmlServerPluginSettingsTab } from './settings/settingsTab';
 
 export default class HtmlServerPlugin extends Plugin {
   public settings!: PluginSettings;
 
   serverController?: ServerController;
+
+  private uiCleanupFns?: { clearRibbonButtons: () => void };
 
   async onload() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -16,7 +18,7 @@ export default class HtmlServerPlugin extends Plugin {
       this.app.workspace.onLayoutReady(resolve)
     );
 
-    setupUiElements(this);
+    this.uiCleanupFns = setupUiElements(this);
 
     this.addSettingTab(new HtmlServerPluginSettingsTab(this.app, this));
 
@@ -54,5 +56,10 @@ export default class HtmlServerPlugin extends Plugin {
     await this.serverController?.stop();
     this.app.workspace.trigger('html-server-event', { isServerRunning: false });
     return !this.serverController?.isRunning();
+  }
+
+  ReloadUiElements() {
+    this.uiCleanupFns?.clearRibbonButtons();
+    this.uiCleanupFns = setupUiElements(this);
   }
 }
