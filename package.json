@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-sample-plugin",
+  "name": "html-",
   "version": "1.0.0",
-  "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+  "description": "This plugin lets you spin up a local http server to access your vault via a web browser from any device in your network.",
   "type": "commonjs",
   "scripts": {
     "start-obsidian": "node scripts/start-obsidian.mjs",
@@ -10,8 +10,8 @@
     "version": "node scripts/version-bump.mjs && git add manifest.json versions.json"
   },
   "keywords": [],
-  "author": "",
-  "license": "MIT",
+  "author": "Pr0dt0s",
+  "license": "GPL 3.0",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
