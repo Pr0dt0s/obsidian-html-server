@@ -380,14 +380,10 @@ function setVars(
       type: 'name' | 'value'
     ) => Promise<OnChangeStatus>
   ) => {
-    // const el = document.createElement('div');
-    // el.className = `setting-item-${className}`;
-    // control.style.textAlign = 'center';
-    // control.style.justifyContent = 'center';
     const inputEl = document.createElement('input');
     inputEl.value = text;
     inputEl.type = 'text';
-    inputEl.style.width = '100%';
+    inputEl.addClass('w100p');
     let updateTimeout: NodeJS.Timeout;
     let to: NodeJS.Timeout;
     inputEl.onchange = ({ target }) => {
@@ -398,13 +394,15 @@ function setVars(
           type
         );
         if (status == 'Error') {
-          inputEl.style.borderColor = 'var(--text-error)';
+          inputEl.addClass('with-error');
+          inputEl.removeClass('with-success');
         } else {
-          inputEl.style.borderColor = 'var(--text-success)';
+          inputEl.removeClass('with-error');
+          inputEl.addClass('with-success');
           clearTimeout(to);
           to = setTimeout(() => {
-            //@ts-ignore
-            inputEl.style.borderColor = null;
+            inputEl.removeClass('with-success');
+            inputEl.removeClass('with-error');
           }, 500);
         }
       }, 100);
