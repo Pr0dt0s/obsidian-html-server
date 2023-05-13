@@ -23,6 +23,10 @@ const developmentConfig = {
     copy({
       targets: [
         {
+          src: 'styles.css',
+          dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
+        },
+        {
           src: 'manifest.json',
           dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
         },
@@ -50,8 +54,20 @@ const productionConfig = {
     copy({
       targets: [
         {
+          src: 'styles.css',
+          dest: 'dist/',
+        },
+        {
           src: 'manifest.json',
           dest: 'dist/',
+        },
+        {
+          src: 'manifest.json',
+          dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
+        },
+        {
+          src: 'dist/main.js',
+          dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
         },
       ],
     }),

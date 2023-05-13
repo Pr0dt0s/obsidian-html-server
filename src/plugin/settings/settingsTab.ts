@@ -67,8 +67,9 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
 
     const invalidPortElement = portSetting.infoEl.createDiv();
     invalidPortElement.hide();
-    invalidPortElement.innerHTML =
-      '<span style="font-weight: bold; color: var(--background-modifier-error)">Must be a valid port number (1 - 65535)</span>';
+    invalidPortElement
+      .createSpan('settings-error-element')
+      .setText('Must be a valid port number (1 - 65535)');
 
     portSetting.addText((cb) => {
       cb.setValue(String(this.plugin.settings.port));
@@ -142,8 +143,9 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
 
     const invalidHostElement = hostSetting.infoEl.createDiv();
     invalidHostElement.hide();
-    invalidHostElement.innerHTML =
-      '<span style="font-weight: bold; color: var(--background-modifier-error)">Must be a valid a non empty hostname/ip address</span>';
+    invalidHostElement
+      .createSpan('settings-error-element')
+      .setText('Must be a valid a non empty hostname/ip address');
 
     hostSetting.addText((cb) => {
       cb.setValue(String(this.plugin.settings.hostname));
@@ -192,13 +194,12 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
     // htmlSettingItem.createDiv('setting-item-name').setText('Custom index.html file.');
 
     const indexHtmlSetting = new Setting(advancedSettings);
-    // .setName()
-    // .setDesc(hostNameDescription);
 
     const invalidHtmlSettingElement = indexHtmlSetting.infoEl.createDiv();
     invalidHtmlSettingElement.hide();
-    invalidHtmlSettingElement.innerHTML =
-      '<span style="font-weight: bold; color: var(--background-modifier-error)">Must be a valid a non empty string</span>';
+    invalidHtmlSettingElement
+      .createSpan('settings-error-element')
+      .setText('Must be a valid a non empty string');
 
     indexHtmlSetting.settingEl.removeClass('setting-item');
     //   .createDiv('setting-item-name')
@@ -266,12 +267,12 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
         });
       });
 
-    indexHtmlSetting.controlEl.style.width = '100%';
+    indexHtmlSetting.controlEl.addClass('w100');
     const textareaElement = indexHtmlSetting.controlEl
       .firstChild as HTMLTextAreaElement;
 
-    textareaElement.style.width = '100%';
-    textareaElement.style.height = '350px';
+    textareaElement.addClass('w100p');
+    textareaElement.addClass('h350');
 
     const htmlVarsContainer = advancedSettings.createDiv('settings-table');
 
@@ -281,7 +282,6 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
       _currentVariableValue,
       index
     ) => {
-      console.table(this.plugin.settings.htmlReplaceableVariables);
       if (!newValue) {
         return { status: 'Error' };
       }
@@ -365,11 +365,11 @@ function setVars(
   const header = element.createDiv('setting-item');
 
   const info = header.createDiv('setting-item-info');
-  info.innerText = 'VARIABLE';
-  info.style.textAlign = 'center';
+  info.innerText = 'Name';
+  info.addClass('text-align-center');
   const control = header.createDiv('setting-item-control');
-  control.innerText = 'VALUE';
-  control.style.justifyContent = 'center';
+  control.innerText = 'Value';
+  control.addClass('justify-content-center');
 
   const createEdditable = (
     text: string,
@@ -379,14 +379,10 @@ function setVars(
       type: 'name' | 'value'
     ) => Promise<OnChangeStatus>
   ) => {
-    // const el = document.createElement('div');
-    // el.className = `setting-item-${className}`;
-    // control.style.textAlign = 'center';
-    // control.style.justifyContent = 'center';
     const inputEl = document.createElement('input');
     inputEl.value = text;
     inputEl.type = 'text';
-    inputEl.style.width = '100%';
+    inputEl.addClass('w100p');
     let updateTimeout: NodeJS.Timeout;
     let to: NodeJS.Timeout;
     inputEl.onchange = ({ target }) => {
@@ -397,13 +393,15 @@ function setVars(
           type
         );
         if (status == 'Error') {
-          inputEl.style.borderColor = 'var(--text-error)';
+          inputEl.addClass('with-error');
+          inputEl.removeClass('with-success');
         } else {
-          inputEl.style.borderColor = 'var(--text-success)';
+          inputEl.removeClass('with-error');
+          inputEl.addClass('with-success');
           clearTimeout(to);
           to = setTimeout(() => {
-            //@ts-ignore
-            inputEl.style.borderColor = null;
+            inputEl.removeClass('with-success');
+            inputEl.removeClass('with-error');
           }, 500);
         }
       }, 100);
@@ -412,7 +410,6 @@ function setVars(
   };
 
   pluggin.settings.htmlReplaceableVariables.forEach((variable, index) => {
-    // const line = element.createDiv('setting-item');
     const line = new Setting(element);
     const eventListener = async (
       target: HTMLInputElement,
@@ -427,10 +424,6 @@ function setVars(
       );
     };
 
-    // const deleteBtn = line.createDiv(
-    //   'clickable-icon setting-editor-extra-setting-button'
-    // );
-    // deleteBtn.append(obsidian.getIcon('x'));
     line.infoEl.append(
       createEdditable(variable.varName, 'name', eventListener)
     );

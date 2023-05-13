@@ -1,0 +1,28 @@
+.settings-error-element {
+  font-weight: bold;
+  color: var(--background-modifier-error);
+}
+
+.with-error {
+  border-color: var(--text-error) !important;
+} 
+
+.with-success {
+  border-color: var(--text-success) !important;
+}
+
+.w100p {
+  width: 100%;
+}
+
+.h350 {
+  height: 350px;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
