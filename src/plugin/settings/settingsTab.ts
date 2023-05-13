@@ -67,8 +67,9 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
 
     const invalidPortElement = portSetting.infoEl.createDiv();
     invalidPortElement.hide();
-    invalidPortElement.innerHTML =
-      '<span style="font-weight: bold; color: var(--background-modifier-error)">Must be a valid port number (1 - 65535)</span>';
+    invalidPortElement
+      .createSpan('settings-error-element')
+      .setText('Must be a valid port number (1 - 65535)');
 
     portSetting.addText((cb) => {
       cb.setValue(String(this.plugin.settings.port));
@@ -142,8 +143,9 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
 
     const invalidHostElement = hostSetting.infoEl.createDiv();
     invalidHostElement.hide();
-    invalidHostElement.innerHTML =
-      '<span style="font-weight: bold; color: var(--background-modifier-error)">Must be a valid a non empty hostname/ip address</span>';
+    invalidHostElement
+      .createSpan('settings-error-element')
+      .setText('Must be a valid a non empty hostname/ip address');
 
     hostSetting.addText((cb) => {
       cb.setValue(String(this.plugin.settings.hostname));
@@ -192,13 +194,12 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
     // htmlSettingItem.createDiv('setting-item-name').setText('Custom index.html file.');
 
     const indexHtmlSetting = new Setting(advancedSettings);
-    // .setName()
-    // .setDesc(hostNameDescription);
 
     const invalidHtmlSettingElement = indexHtmlSetting.infoEl.createDiv();
     invalidHtmlSettingElement.hide();
-    invalidHtmlSettingElement.innerHTML =
-      '<span style="font-weight: bold; color: var(--background-modifier-error)">Must be a valid a non empty string</span>';
+    invalidHtmlSettingElement
+      .createSpan('settings-error-element')
+      .setText('Must be a valid a non empty string');
 
     indexHtmlSetting.settingEl.removeClass('setting-item');
     //   .createDiv('setting-item-name')
@@ -266,12 +267,12 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
         });
       });
 
-    indexHtmlSetting.controlEl.style.width = '100%';
+    indexHtmlSetting.controlEl.addClass('w100');
     const textareaElement = indexHtmlSetting.controlEl
       .firstChild as HTMLTextAreaElement;
 
-    textareaElement.style.width = '100%';
-    textareaElement.style.height = '350px';
+    textareaElement.addClass('w100p');
+    textareaElement.addClass('h350');
 
     const htmlVarsContainer = advancedSettings.createDiv('settings-table');
 
@@ -365,11 +366,11 @@ function setVars(
   const header = element.createDiv('setting-item');
 
   const info = header.createDiv('setting-item-info');
-  info.innerText = 'VARIABLE';
-  info.style.textAlign = 'center';
+  info.innerText = 'Name';
+  info.addClass('text-align-center');
   const control = header.createDiv('setting-item-control');
-  control.innerText = 'VALUE';
-  control.style.justifyContent = 'center';
+  control.innerText = 'Value';
+  control.addClass('justify-content-center');
 
   const createEdditable = (
     text: string,
