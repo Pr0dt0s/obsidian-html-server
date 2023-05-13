@@ -4,11 +4,11 @@
 }
 
 .with-error {
-  border-color: var(--text-error);
+  border-color: var(--text-error) !important;
 } 
 
 .with-success {
-  border-color: var(--text-success);
+  border-color: var(--text-success) !important;
 }
 
 .w100p {

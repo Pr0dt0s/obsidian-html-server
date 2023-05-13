@@ -282,7 +282,6 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
       _currentVariableValue,
       index
     ) => {
-      console.table(this.plugin.settings.htmlReplaceableVariables);
       if (!newValue) {
         return { status: 'Error' };
       }
@@ -411,7 +410,6 @@ function setVars(
   };
 
   pluggin.settings.htmlReplaceableVariables.forEach((variable, index) => {
-    // const line = element.createDiv('setting-item');
     const line = new Setting(element);
     const eventListener = async (
       target: HTMLInputElement,
@@ -426,10 +424,6 @@ function setVars(
       );
     };
 
-    // const deleteBtn = line.createDiv(
-    //   'clickable-icon setting-editor-extra-setting-button'
-    // );
-    // deleteBtn.append(obsidian.getIcon('x'));
     line.infoEl.append(
       createEdditable(variable.varName, 'name', eventListener)
     );
