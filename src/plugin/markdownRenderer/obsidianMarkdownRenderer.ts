@@ -42,14 +42,12 @@ export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
       }
     };
 
-    console.log(
-      'Patching queueRender Function to be able to render even when the main Obsidian window is minimized/not focused'
-    );
+    // console.log(
+    //   'Patching queueRender Function to be able to render even when the main Obsidian window is minimized/not focused'
+    // );
     MarkdownPreviewRenderer.prototype.queueRender = alteredQueueRenderFn;
 
     this.plugin.register(() => {
-      console.log('Restoring the original queueRenderFunction');
-
       MarkdownPreviewRenderer.prototype.queueRender = originalQueueRenderFn;
     });
   }
@@ -82,7 +80,6 @@ export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
 
     const renderedPromise = new Promise<string>((resolve, _reject) => {
       view.currentMode.onRenderComplete = () => {
-        console.log(`${n} renderComplete`);
         if (view.currentMode.renderer.queued) {
           return;
         }
@@ -191,10 +188,8 @@ export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
       if (imageElement) imageElement.src = src;
     });
 
-    const callouts = el.querySelectorAll('.callout');
-    callouts.forEach((callout) => {
-      console.log(callout);
-    });
-    console.log(callouts.length);
+    // const callouts = el.querySelectorAll('.callout');
+    // callouts.forEach((callout) => {
+    // });
   }
 }

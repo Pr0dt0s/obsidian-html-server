@@ -1,3 +1,5 @@
+import { randomBytes } from 'crypto';
+
 export type PluginSettings = {
   port: number;
   defaultFile: string;
@@ -7,6 +9,9 @@ export type PluginSettings = {
   indexHtml: string;
   htmlReplaceableVariables: { varName: string; varValue: string }[];
   showAdvancedOptions: boolean;
+  useSimpleAuth: boolean;
+  simpleAuthUsername: string;
+  simpleAuthPassword: string;
 };
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -76,4 +81,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     },
   ],
   showAdvancedOptions: false,
+  useSimpleAuth: false,
+  simpleAuthUsername: 'obsidian',
+  simpleAuthPassword: randomBytes(8).toString('hex'),
 };

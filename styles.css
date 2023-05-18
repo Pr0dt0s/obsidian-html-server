@@ -26,3 +26,39 @@
 .justify-content-center {
   justify-content: center;
 }
+
+.html-form-container {
+  width: 100%;
+  display: grid;
+  justify-content: center;
+  padding-bottom: 22px;
+}
+
+.html-login-form {
+  width: 20%;
+  min-width: 300px;
+  max-width: 450px;
+  margin: auto;
+}
+
+.html-login-form .html-login-form-label{
+  font-size: 1.1em;
+  justify-content: center;
+  display: block;
+}
+
+.html-login-form .setting-item-control input{
+  width: 100%;
+}
+
+.html-login-form .html-form-button{
+  width: 100%;
+  /* justify-content: center; */
+}
+
+.html-login-form .html-form-button button{
+  width: 100%;
+  justify-content: center;
+}
+
+

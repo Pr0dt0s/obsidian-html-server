@@ -1,9 +1,14 @@
-import express from 'express';
+import express, { Handler } from 'express';
+import expressSession from 'express-session';
+
 import { IncomingMessage, Server, ServerResponse } from 'http';
 import HtmlServerPlugin from './main';
 import mime from 'mime-types';
 import { CustomMarkdownRenderer } from './markdownRenderer/customMarkdownRenderer';
 import { ObsidianMarkdownRenderer } from './markdownRenderer/obsidianMarkdownRenderer';
+import * as passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { randomBytes } from 'crypto';
 
 export class ServerController {
   app: express.Application;
@@ -13,18 +18,48 @@ export class ServerController {
   constructor(private plugin: HtmlServerPlugin) {
     this.app = express();
 
+    this.app.use(
+      expressSession({ secret: randomBytes(16).toString('base64') })
+    );
+    this.app.use(passport.initialize());
+    this.app.use(passport.session());
+
+    passport.serializeUser(function (user, done) {
+      done(null, user);
+    });
+
+    passport.deserializeUser(function (username, done) {
+      done(null, { username });
+    });
+
     this.markdownRenderer = new ObsidianMarkdownRenderer(plugin, plugin.app);
 
-    this.app.use('/', async (req, res) => {
+    passport.use(
+      new LocalStrategy((username, password, done) => {
+        if (
+          username === this.plugin.settings.simpleAuthUsername &&
+          password === this.plugin.settings.simpleAuthPassword
+        ) {
+          done(null, { username });
+          return;
+        }
+        done('Wrong Credentials');
+      })
+    );
+
+    this.app.use(express.urlencoded());
+
+    this.app.post('/login', passport.authenticate('local', {}), (req, res) => {
+      res.redirect(req.body.redirectUrl || '/');
+    });
+
+    this.app.use('/', this.authenticateIfNeeded, async (req, res) => {
       let path = req.path;
       if (!path || path === '/') {
         path = '/' + plugin.settings.defaultFile;
-        console.log(plugin.settings.defaultFile);
       }
 
       const r = await this.createFileResolver()(decodeURI(path));
-
-      console.log(r);
 
       if (!r) {
         res.status(404).write(`Couldn't resolve file at path '${req.path}'`);
@@ -52,7 +87,6 @@ export class ServerController {
               resolve(server);
             }
           );
-          console.log('Server Started!');
         } catch (error) {
           console.error('error trying to start the server', error);
           resolve(undefined);
@@ -82,6 +116,106 @@ export class ServerController {
     return this.server?.listening;
   }
 
+  authenticateIfNeeded: Handler = (req, res, next) => {
+    if (!this.plugin.settings.useSimpleAuth) return next();
+
+    if (req.user) return next();
+
+    if (req.url.endsWith('.css') || req.url.endsWith('.ico')) return next();
+
+    const nonce = randomBytes(16).toString('base64');
+    res.contentType('text/html; charset=UTF-8');
+    res.setHeader('Content-Security-Policy', `script-src 'nonce-${nonce}'`);
+
+    const loginForm = parseHtmlVariables(
+      `
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>#VAR{HTML_TITLE}</title>
+  <link rel="shortcut icon" href="#VAR{FAVICON_URL}">
+  <link href="#VAR{CSS_FILE_URL}" type="text/css" rel="stylesheet">
+</head>
+<body
+  class="#VAR{THEME_MODE} mod-windows is-frameless is-maximized is-hidden-frameless obsidian-app show-inline-title show-view-header"
+  style="--zoom-factor:1; --font-text-size:16px;">
+  <div class="app-container">
+    <div class="horizontal-main-container">
+      <div class="workspace">
+        <div class="workspace-split mod-vertical mod-root">
+          <div class="workspace-tabs mod-top mod-top-left-space mod-top-right-space">
+            <div class="workspace-tab-container">
+              <div class="workspace-leaf">
+                <div class="workspace-leaf-content" data-type="markdown" data-mode="preview">
+                  <div class="view-content">
+                    <div class="markdown-reading-view" style="width: 100%; height: 100%;">
+                      <div
+                        class="markdown-preview-view markdown-rendered node-insert-event is-readable-line-width allow-fold-headings show-indentation-guide allow-fold-lists"
+                        tabindex="-1" style="tab-size: 4; height: 100% !important;">
+                        <div class="markdown-preview-sizer markdown-preview-section" style="min-height: calc(100% - var(--file-margins) - var(--file-margins));">
+                          <div class="markdown-preview-pusher" style="width: 1px; height: 0.1px; margin-bottom: 0px;"></div>
+                          <div class="mod-header"></div>
+                          <div class="prompt">
+                            <div class="html-form-container">
+                              <h1>#VAR{HTML_TITLE}</h1>
+                              <form action="login" method="POST" class="html-login-form">
+                                <div class="html-login-form-label"><label for="username">Username:</label></div>
+                                <div class="setting-item-control">
+                                  <input placeholder="Username" id="username" type="text" name="username" spellcheck="false">
+                                </div>
+                                <br>
+                                <div class="html-login-form-label"><label for="password">Password:</label></div>
+                                <div class="setting-item-control">
+                                <input placeholder="Password" id="password" type="password" name="password" spellcheck="false">
+                                </div>
+                                <input style="display: none;" id="redirectUrl" type="text" name="redirectUrl" spellcheck="false">
+                                <br>
+                                <div class="html-form-button">
+                                  <button class="mod-cta" action="submit">Login</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script nonce="#VAR{NONCE}"> redirectUrl.value = "#VAR{REDIRECT_URL}"; </script>
+</body>
+</html>
+`,
+      [
+        ...this.plugin.settings.htmlReplaceableVariables,
+        {
+          varName: 'THEME_MODE',
+          varValue: document.body.classList.contains('theme-dark')
+            ? 'theme-dark'
+            : 'theme-light',
+        },
+        {
+          varName: 'REDIRECT_URL',
+          varValue: req.url,
+        },
+        {
+          varName: 'NONCE',
+          varValue: nonce,
+        },
+      ]
+    );
+
+    res.send(loginForm);
+  };
+
   createFileResolver() {
     const fullCssText =
       Array.from(document.styleSheets)
@@ -96,7 +230,6 @@ export class ServerController {
       payload: string | Buffer;
     } | null> = async (requestedUrl: string) => {
       if (requestedUrl == '/.obsidian/plugins/obsidian-http-server/app.css') {
-        console.log('handling css');
         return {
           contentType: 'text/css',
           payload: fullCssText,
@@ -230,7 +363,6 @@ export function renderFileInBrowserWindow(requestedUrl: string) {
         }
       ) => {
         if (renderedUrl == requestedUrl) {
-          console.log('handling correct data');
           //@ts-ignore
           bw.close();
           //@ts-ignore

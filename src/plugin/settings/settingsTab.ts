@@ -94,11 +94,79 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
         new FileSuggest(cb.inputEl);
         cb.setValue(this.plugin.settings.defaultFile);
         cb.onChange(async (value) => {
-          value ? advancedSettings.show() : advancedSettings.hide();
           this.plugin.settings.defaultFile = value;
           await this.saveAndReload();
         });
       });
+
+    new Setting(containerEl)
+      .setName('Use Simple Authentication (User/Password).')
+      .addToggle((cb) => {
+        cb.setValue(this.plugin.settings.useSimpleAuth);
+        cb.onChange(async (value) => {
+          value
+            ? simpleAuthSettingsContainer.show()
+            : simpleAuthSettingsContainer.hide();
+          this.plugin.settings.useSimpleAuth = value;
+          await this.saveAndReload();
+        });
+      });
+
+    const simpleAuthSettingsContainer = containerEl.createDiv();
+    this.plugin.settings.useSimpleAuth
+      ? simpleAuthSettingsContainer.show()
+      : simpleAuthSettingsContainer.hide();
+
+    simpleAuthSettingsContainer.createDiv().classList.add('setting-item');
+
+    const usernameSetting = new Setting(simpleAuthSettingsContainer)
+      .setName('Simple Auth Username.')
+      .setTooltip('Username used to login.')
+      .setDesc("Default: 'obsidian'");
+
+    const invalidUserName = usernameSetting.infoEl.createDiv();
+    invalidUserName.hide();
+    invalidUserName
+      .createSpan('settings-error-element')
+      .setText('Must be a non empty string');
+
+    usernameSetting.addText((cb) => {
+      cb.setValue(this.plugin.settings.simpleAuthUsername);
+      cb.onChange(async (value) => {
+        if (!value) {
+          invalidUserName.show();
+          return;
+        }
+        invalidUserName.hide();
+        this.plugin.settings.simpleAuthUsername = value;
+        await this.saveAndReload();
+      });
+    });
+
+    const passwordSetting = new Setting(simpleAuthSettingsContainer)
+      .setName('Simple Auth Password.')
+      .setTooltip('Password used to login.')
+      .setDesc('Must be at least 6 characthers long');
+
+    const invalidPassword = passwordSetting.infoEl.createDiv();
+    invalidPassword.hide();
+    invalidPassword
+      .createSpan('settings-error-element')
+      .setText("The password doesn't meet the minimum required lenght");
+
+    passwordSetting.addText((cb) => {
+      cb.inputEl.type = 'password';
+      cb.setValue(this.plugin.settings.simpleAuthPassword);
+      cb.onChange(async (value) => {
+        if (!value || value.length < 6) {
+          invalidPassword.show();
+          return;
+        }
+        invalidPassword.hide();
+        this.plugin.settings.simpleAuthPassword = value;
+        await this.saveAndReload();
+      });
+    });
 
     new Setting(containerEl)
       .setName('Show Advanced Settings.')
@@ -115,7 +183,6 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
     this.plugin.settings.showAdvancedOptions
       ? advancedSettings.show()
       : advancedSettings.hide();
-    // advancedSettings.hide();
 
     advancedSettings.createDiv().classList.add('setting-item');
 

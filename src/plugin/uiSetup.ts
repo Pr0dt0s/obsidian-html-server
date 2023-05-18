@@ -3,10 +3,8 @@ import HtmlServerPlugin from './main';
 
 const addRibbonButtons = (plugin: HtmlServerPlugin) => {
   if (!plugin.settings.useRibbonButons) {
-    console.log('Ribbon Buttons disabled');
     return () => {};
   }
-  console.log('Setting up Ui elements (Ribbon Buttons)');
 
   const startButton = plugin.addRibbonIcon(
     'wifi-off',
