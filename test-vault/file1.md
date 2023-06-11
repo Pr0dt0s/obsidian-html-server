@@ -7,7 +7,7 @@ Example markdown file
 ###### h5
 
 #### Project Milestones:
-- [x] Implement basic funcitionality.
+- [x] Implement basic functionality.
 - [ ] Create Unit tests.
 - [ ] Publish the plugin in the official Obsidian Repository.
 - [ ] Create Github actions to publish automatically.
