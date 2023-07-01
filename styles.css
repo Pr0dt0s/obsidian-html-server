@@ -61,4 +61,7 @@
   justify-content: center;
 }
 
-
+.http-server-ribbon-stop-button {
+  color: var(--text-accent);
+  opacity: 0.95;
+}
