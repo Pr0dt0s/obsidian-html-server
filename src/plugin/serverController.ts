@@ -173,7 +173,7 @@ export class ServerController {
                                 </div>
                                 <input style="display: none;" id="redirectUrl" type="text" name="redirectUrl" spellcheck="false">
                                 <br>
-                                <span class="settings-error-element" id="error"></span>
+                                <span class="settings-error-element" hidden id="error"></span>
                                 <div class="html-form-button">
                                   <button class="mod-cta" id="loginBtn">Login</button>
                                 </div>
@@ -200,7 +200,7 @@ export class ServerController {
         const password = document.getElementById('password').value;
         if(!username || !password) {
           error.innerText = 'You need to fill the Username and Password fields.';
-          error.style.display = 'block';
+          error.hidden = false;
           return;
         }
         var xhttp = new XMLHttpRequest();
@@ -209,7 +209,7 @@ export class ServerController {
             window.location = redirectUrl.value;
           } else {
             error.innerText = 'Worng credentials.';
-            error.style.display = 'block';
+            error.hidden = false;
           }
         };
         xhttp.open("POST", "/login", true);
@@ -219,7 +219,7 @@ export class ServerController {
       }
       catch (err){
         error.innerText = 'Something went wrong.';
-        error.style.display = 'block';
+        error.hidden = false;
         console.error(err);
       }
     }
