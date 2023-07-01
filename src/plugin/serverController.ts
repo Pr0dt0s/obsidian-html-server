@@ -54,12 +54,12 @@ export class ServerController {
     });
 
     this.app.use('/', this.authenticateIfNeeded, async (req, res) => {
-      let path = req.path;
+      let path = decodeURI(req.path);
       if (!path || path === '/') {
         path = '/' + plugin.settings.defaultFile;
       }
 
-      const r = await this.createFileResolver()(decodeURI(path));
+      const r = await this.createFileResolver()(path);
 
       if (!r) {
         res.status(404).write(`Couldn't resolve file at path '${req.path}'`);
@@ -123,13 +123,14 @@ export class ServerController {
 
     if (req.url.endsWith('.css') || req.url.endsWith('.ico')) return next();
 
-    const nonce = randomBytes(16).toString('base64');
+    const nonce = randomBytes(32).toString('base64');
+
     res.contentType('text/html; charset=UTF-8');
     res.setHeader('Content-Security-Policy', `script-src 'nonce-${nonce}'`);
 
     const loginForm = parseHtmlVariables(
-      `
-<html>
+      `<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport"
@@ -160,7 +161,7 @@ export class ServerController {
                           <div class="prompt">
                             <div class="html-form-container">
                               <h1>#VAR{HTML_TITLE}</h1>
-                              <form action="login" method="POST" class="html-login-form">
+                              <div class="html-login-form">
                                 <div class="html-login-form-label"><label for="username">Username:</label></div>
                                 <div class="setting-item-control">
                                   <input placeholder="Username" id="username" type="text" name="username" spellcheck="false">
@@ -172,10 +173,11 @@ export class ServerController {
                                 </div>
                                 <input style="display: none;" id="redirectUrl" type="text" name="redirectUrl" spellcheck="false">
                                 <br>
+                                <span class="settings-error-element" id="error"></span>
                                 <div class="html-form-button">
-                                  <button class="mod-cta" action="submit">Login</button>
+                                  <button class="mod-cta" id="loginBtn">Login</button>
                                 </div>
-                              </form>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -190,7 +192,41 @@ export class ServerController {
       </div>
     </div>
   </div>
-  <script nonce="#VAR{NONCE}"> redirectUrl.value = "#VAR{REDIRECT_URL}"; </script>
+  <script nonce="${nonce}" type="text/javascript">
+    function test() {
+      try {
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        if(!username || !password) {
+          error.innerText = 'You need to fill the Username and Password fields.';
+          error.style.display = 'block';
+          return;
+        }
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            window.location = redirectUrl.value;
+          } else {
+            error.innerText = 'Worng credentials.';
+            error.style.display = 'block';
+          }
+        };
+        xhttp.open("POST", "/login", true);
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        
+        xhttp.send(\`username=\${username}&password=\${password}\`);
+      }
+      catch (err){
+        error.innerText = 'Something went wrong.';
+        error.style.display = 'block';
+        console.error(err);
+      }
+    }
+
+    loginBtn.addEventListener('click',test);
+
+  </script>
 </body>
 </html>
 `,
@@ -229,7 +265,7 @@ export class ServerController {
       contentType: string;
       payload: string | Buffer;
     } | null> = async (requestedUrl: string) => {
-      if (requestedUrl == '/.obsidian/plugins/obsidian-http-server/app.css') {
+      if (requestedUrl === '/.obsidian/plugins/obsidian-http-server/app.css') {
         return {
           contentType: 'text/css',
           payload: fullCssText,
