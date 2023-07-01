@@ -32,8 +32,7 @@ const addRibbonButtons = (plugin: HtmlServerPlugin) => {
     }
   );
 
-  stopButton.style.color = 'var(--text-accent)';
-  stopButton.style.opacity = '0.95';
+  stopButton.classList.add('http-server-ribbon-stop-button');
 
   const changeButtonsState = ({
     isServerRunning,
