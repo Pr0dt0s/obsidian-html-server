@@ -1,5 +1,5 @@
 {
-  "defaultViewMode": "preview",
+  "defaultViewMode": "source",
   "showInlineTitle": true,
-  "livePreview": false
+  "livePreview": true
 }

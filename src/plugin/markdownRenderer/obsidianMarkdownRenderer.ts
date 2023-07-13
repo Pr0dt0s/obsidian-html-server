@@ -6,6 +6,7 @@ import {
 } from 'typings';
 import HtmlServerPlugin from 'plugin/main';
 import { CustomMarkdownRenderer } from './customMarkdownRenderer';
+import { MarkdownPreviewView } from 'obsidian';
 
 export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
   rootElement: HTMLDivElement;
@@ -75,6 +76,8 @@ export class ObsidianMarkdownRenderer extends CustomMarkdownRenderer {
     const view = new MarkdownView(leaf);
     leaf.view = view;
 
+    // @ts-ignore
+    view.currentMode = new MarkdownPreviewView(leaf.view);
     view.currentMode.type = 'preview';
     let n = 0;
 
