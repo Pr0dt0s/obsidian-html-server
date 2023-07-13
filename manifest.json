@@ -1,7 +1,7 @@
 {
   "id": "html-server",
   "name": "Html Server",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "minAppVersion": "0.15.0",
   "description": "This plugin lets you spin up a local http server to access your vault via a web browser from any device in your network.",
   "author": "Pr0dt0s",
