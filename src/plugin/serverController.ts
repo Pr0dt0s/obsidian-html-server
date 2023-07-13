@@ -307,7 +307,8 @@ export class ServerController {
         });
         if (requestedFile?.extension && requestedFile.extension === 'md') {
           const markdown = await requestedFile.vault.read(requestedFile);
-
+          const renderedMarkdown =
+            await this.markdownRenderer.renderHtmlFromMarkdown(markdown);
           return {
             contentType: 'text/html',
             payload: parseHtmlVariables(
@@ -320,9 +321,7 @@ export class ServerController {
                 },
                 {
                   varName: 'RENDERED_CONTENT',
-                  varValue: await this.markdownRenderer.renderHtmlFromMarkdown(
-                    markdown
-                  ),
+                  varValue: renderedMarkdown,
                 },
                 {
                   varName: 'THEME_MODE',
