@@ -1,6 +1,4 @@
 [
   "hot-reload",
-  "templater-obsidian",
-  "obsidian-html-server",
   "html-server"
 ]
