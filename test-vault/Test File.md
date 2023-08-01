@@ -1,10 +1,10 @@
 ---
 htmlvars:
   LANG: en
-  HTML_TITLE: Custom Title!
-  RENDERED_CONTENT_FILE_NAME: '<div style="position= sticky; top: 10px; width:
-    100%;"> Custom File Name Content from FrontMatter!
-    </div><script>alert(1);</script>'
+  HTML_TITLE: Custom Tab Title!
+  RENDERED_CONTENT_FILE_NAME: '<div style="position= sticky; padding:10;
+    background-color: #a455a1; top: 10px; width: 100%;"> Custom File Name
+    Content from FrontMatter! </div>'
 ---
 # Current Working Features
   
