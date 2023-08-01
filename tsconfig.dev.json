@@ -6,7 +6,7 @@
     "target": "ESNext",
     "allowJs": false,
     "strict": true,
-    "removeComments": true,
+    "removeComments": false,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "importHelpers": false,

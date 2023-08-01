@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "outDir": "./dist",
-    "module": "esnext",
-    "target": "esnext",
+    "outDir": "dist",
+    "module": "ESNext",
+    "target": "ESNext",
     "allowJs": false,
     "strict": true,
     "removeComments": true,
@@ -11,14 +11,11 @@
     "moduleResolution": "node",
     "importHelpers": false,
     "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
-    "lib": ["DOM", "ES5", "ES6", "ES7"],
-    "allowSyntheticDefaultImports": true
+    "lib": ["DOM", "ES5", "ES6", "ES7"]
   },
   "include": ["**/*.ts"],
-  "watchOptions": {
-    "watchDirectory": "usefsevents"
-  },
   "buildOptions": {
     "incremental": true
   }

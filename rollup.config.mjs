@@ -50,7 +50,7 @@ const productionConfig = {
     json(),
     nodeResolve({ preferBuiltins: true }),
     cjs({ include: 'node_modules/**' }),
-    typescript({ tsconfig: './tsconfig.json', outDir: './' }),
+    typescript({ tsconfig: './tsconfig.json' }),
     copy({
       targets: [
         {
@@ -60,14 +60,6 @@ const productionConfig = {
         {
           src: 'manifest.json',
           dest: 'dist/',
-        },
-        {
-          src: 'manifest.json',
-          dest: 'test-vault/.obsidian/plugins/html-server/',
-        },
-        {
-          src: 'dist/main.js',
-          dest: 'test-vault/.obsidian/plugins/html-server/',
         },
       ],
     }),
