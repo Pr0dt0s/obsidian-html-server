@@ -29,7 +29,7 @@ If you encounter any issues or would like to request a new feature, please submi
 
 This plugin uses variables in the templates to replace content in the HTML that is served. The default variables can be seen by enabling the setting `Show Advanced Settings.` as shown below.
 
-![[assets/vars.png]]
+![/assets/vars.png](/assets/vars.png)
 
 These variables have default values set in the plugins configuration, but can be modified using the frontmatter of each file. The variables are applied using the following priority:
 
@@ -79,7 +79,7 @@ And in the html template you would use it like this:
 #VAR{FM:tags}
 ```
 
-![[frontmatter_vars.png]]
-![[rendered_example.png]]
+![/assets/frontmatter_vars.png](/assets/frontmatter_vars.png)
+![/assets/rendered_example.png](/assets/rendered_example.png)
 
 </details>
