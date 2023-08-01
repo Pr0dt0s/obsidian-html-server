@@ -1,3 +1,6 @@
+---
+html.LANGUAGE=es
+---
 # Current Working Features
   
 - [x] External Link
@@ -71,4 +74,8 @@ Working! --> [*]
 - [x] Embedded File
 
 ![[file1]]
+
+
+- [x]  Canvas
+![[test.canvas]]
 
