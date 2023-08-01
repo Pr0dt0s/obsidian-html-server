@@ -75,7 +75,6 @@ Working! --> [*]
 
 ![[file1]]
 
-
 - [x]  Canvas
 ![[test.canvas]]
 
