@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "outDir": "test-vault/.obsidian/plugins/obsidian-html-server",
+    "outDir": "test-vault/.obsidian/plugins/html-server",
     "module": "ESNext",
     "target": "ESNext",
     "allowJs": false,
     "strict": true,
-    "removeComments": true,
+    "removeComments": false,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "importHelpers": false,

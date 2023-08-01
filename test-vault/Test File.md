@@ -1,3 +1,12 @@
+---
+tags: Test File, development
+htmlvars:
+  LANG: en
+  HTML_TITLE: Custom Tab Title!
+  RENDERED_CONTENT_FILE_NAME: '<div style="position= sticky; padding:10;
+    background-color: #a455a1; top: 10px; width: 100%;"> Custom File Name
+    Content from FrontMatter! </div>'
+---
 # Current Working Features
   
 - [x] External Link
@@ -29,6 +38,23 @@
 ```typescript
 type StringFn: () => string
 const test: StringFn = () => 'Testing Sintax, this is working...';
+```
+
+- [x] Code without sintax
+```
+asdasd
+asd
+s
+s
+
+s
+
+
+ssa
+a
+a
+s
+
 ```
 
 - [x] Tables
@@ -71,4 +97,7 @@ Working! --> [*]
 - [x] Embedded File
 
 ![[file1]]
+
+- [x]  Canvas
+![[test.canvas]]
 

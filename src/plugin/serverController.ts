@@ -9,6 +9,7 @@ import { ObsidianMarkdownRenderer } from './markdownRenderer/obsidianMarkdownRen
 import * as passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { randomBytes } from 'crypto';
+import { App, TFile } from 'obsidian';
 
 export class ServerController {
   app: express.Application;
@@ -305,7 +306,12 @@ export class ServerController {
             '/' + file.path == requestedUrl + '.md'
           );
         });
+
         if (requestedFile?.extension && requestedFile.extension === 'md') {
+          const frontmatterVariables = await readFrontmatter(
+            requestedFile,
+            this.plugin.app
+          );
           const markdown = await requestedFile.vault.read(requestedFile);
           const renderedMarkdown =
             await this.markdownRenderer.renderHtmlFromMarkdown(markdown);
@@ -314,14 +320,9 @@ export class ServerController {
             payload: parseHtmlVariables(
               this.plugin.settings.indexHtml || '<html></html>',
               [
-                ...this.plugin.settings.htmlReplaceableVariables,
                 {
                   varName: 'RENDERED_CONTENT_FILE_NAME',
                   varValue: requestedFile.basename,
-                },
-                {
-                  varName: 'RENDERED_CONTENT',
-                  varValue: renderedMarkdown,
                 },
                 {
                   varName: 'THEME_MODE',
@@ -329,6 +330,12 @@ export class ServerController {
                     ? 'theme-dark'
                     : 'theme-light',
                 },
+                {
+                  varName: 'RENDERED_CONTENT',
+                  varValue: renderedMarkdown,
+                },
+                ...this.plugin.settings.htmlReplaceableVariables,
+                ...frontmatterVariables,
               ]
             ),
           };
@@ -346,6 +353,34 @@ export class ServerController {
     };
     return tryResolveFile;
   }
+}
+
+async function readFrontmatter(file: TFile, app: App) {
+  return new Promise<{ varName: string; varValue: string }[]>((resolve) => {
+    app.fileManager
+      .processFrontMatter(file, (frontMatter) => {
+        const parsedVariables: { varName: string; varValue: string }[] = [];
+
+        Object.entries(frontMatter || {}).forEach(([key, value]) => {
+          if (typeof value === 'object') return;
+          parsedVariables.push({
+            varName: 'FM:' + key,
+            varValue: String(value),
+          });
+        });
+
+        Object.entries(frontMatter.htmlvars || {}).forEach(([key, value]) => {
+          parsedVariables.push({ varName: key, varValue: String(value) });
+        });
+        console.log(parsedVariables);
+        resolve(parsedVariables);
+      })
+      .catch((error) => {
+        console.error('Error Parsing Frontmatter');
+        console.error(error);
+        resolve([]);
+      });
+  });
 }
 
 function parseHtmlVariables(

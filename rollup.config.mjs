@@ -9,7 +9,7 @@ const developmentConfig = {
   input: 'src/plugin/main.ts',
   external: ['obsidian'],
   output: {
-    dir: 'test-vault/.obsidian/plugins/obsidian-html-server',
+    dir: 'test-vault/.obsidian/plugins/html-server',
     sourcemap: false,
     format: 'cjs',
     exports: 'default',
@@ -19,16 +19,16 @@ const developmentConfig = {
     json(),
     nodeResolve({ preferBuiltins: true }),
     cjs({ include: 'node_modules/**' }),
-    typescript({ tsconfig: 'tsconfig.dev.json' }),
+    typescript({ tsconfig: './tsconfig.dev.json' }),
     copy({
       targets: [
         {
           src: 'styles.css',
-          dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
+          dest: 'test-vault/.obsidian/plugins/html-server/',
         },
         {
           src: 'manifest.json',
-          dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
+          dest: 'test-vault/.obsidian/plugins/html-server/',
         },
       ],
     }),
@@ -50,7 +50,7 @@ const productionConfig = {
     json(),
     nodeResolve({ preferBuiltins: true }),
     cjs({ include: 'node_modules/**' }),
-    typescript({ tsconfig: 'tsconfig.json' }),
+    typescript({ tsconfig: './tsconfig.json' }),
     copy({
       targets: [
         {
@@ -60,14 +60,6 @@ const productionConfig = {
         {
           src: 'manifest.json',
           dest: 'dist/',
-        },
-        {
-          src: 'manifest.json',
-          dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
-        },
-        {
-          src: 'dist/main.js',
-          dest: 'test-vault/.obsidian/plugins/obsidian-html-server/',
         },
       ],
     }),

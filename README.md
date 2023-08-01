@@ -23,3 +23,63 @@ Simply enable the plugin, start the server and open a web browser at `http://loc
 ## Issues/Requests
 
 If you encounter any issues or would like to request a new feature, please submit them [here](https://github.com/Pr0dt0s/obsidian-html-server/issues/new).
+
+<details>
+<summary>Advanced Usage</summary>
+
+This plugin uses variables in the templates to replace content in the HTML that is served. The default variables can be seen by enabling the setting `Show Advanced Settings.` as shown below.
+
+![[assets/vars.png]]
+
+These variables have default values set in the plugins configuration, but can be modified using the frontmatter of each file. The variables are applied using the following priority:
+
+1. Variable values from the file's frontmatter:
+
+```
+---
+tags: Test File, development
+htmlvars:
+  LANG: en
+  HTML_TITLE: Custom Tab Title!
+  RENDERED_CONTENT_FILE_NAME: '<div style="padding:10;
+    background-color: #a455a1; width: 100%;"> Custom File Title
+    Content from FrontMatter!</div>'
+---
+```
+
+> These variables must be set inside a property named `htmlvars` in the frontmatter following YAML syntaxis.
+
+2. Variable values set in the settings.
+
+   > These would work as default values if the variable is not set in a specific file.
+
+3. Internal values set from the plugin.
+
+The `internal variables` used at the moment are:
+
+- RENDERED_CONTENT_FILE_NAME (The file name that is being opened)
+- RENDERED_CONTENT (the whole content of the rendered file)
+- THEME_MODE (`theme-dark` or `theme-light` according to your current appearance settings)
+
+Please take note that you **can** overwrite the `internal variables` either from the settings or from the file's frontmatter.
+
+You can use other frontmatter properties as variables in your templates but they can only be Strings or Numbers and you must prefix `FM:` to the variable name.
+
+Example:
+
+```
+---
+tags: Test File, development
+---
+```
+
+And in the html template you would use it like this:
+
+```html
+#VAR{FM:tags}
+```
+
+![[frontmatter_vars.png]]
+![[rendered_example.png]]
+
+</details>
