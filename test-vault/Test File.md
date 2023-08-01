@@ -1,5 +1,10 @@
 ---
-html.LANGUAGE=es
+htmlvars:
+  LANG: en
+  HTML_TITLE: Custom Title!
+  RENDERED_CONTENT_FILE_NAME: '<div style="position= sticky; top: 10px; width:
+    100%;"> Custom File Name Content from FrontMatter!
+    </div><script>alert(1);</script>'
 ---
 # Current Working Features
   
@@ -32,6 +37,23 @@ html.LANGUAGE=es
 ```typescript
 type StringFn: () => string
 const test: StringFn = () => 'Testing Sintax, this is working...';
+```
+
+- [x] Code without sintax
+```
+asdasd
+asd
+s
+s
+
+s
+
+
+ssa
+a
+a
+s
+
 ```
 
 - [x] Tables
