@@ -1,6 +1,6 @@
 import { Plugin } from 'typings';
 import { PluginSettings, DEFAULT_SETTINGS } from './settings/settings';
-import { ServerController } from './serverController';
+import { ServerController } from './server/controller';
 import { setupUiElements } from './uiSetup';
 import { HtmlServerPluginSettingsTab } from './settings/settingsTab';
 

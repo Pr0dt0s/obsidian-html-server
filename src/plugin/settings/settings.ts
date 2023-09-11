@@ -1,5 +1,7 @@
 import { randomBytes } from 'crypto';
 
+export type ReplaceableVariables = { varName: string; varValue: string };
+
 export type PluginSettings = {
   port: number;
   defaultFile: string;
@@ -7,7 +9,7 @@ export type PluginSettings = {
   startOnLoad: boolean;
   useRibbonButons: boolean;
   indexHtml: string;
-  htmlReplaceableVariables: { varName: string; varValue: string }[];
+  htmlReplaceableVariables: ReplaceableVariables[];
   showAdvancedOptions: boolean;
   useSimpleAuth: boolean;
   simpleAuthUsername: string;
@@ -28,6 +30,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   <title>#VAR{HTML_TITLE}</title>
   <link rel="shortcut icon" href="#VAR{FAVICON_URL}">
   <link href="#VAR{CSS_FILE_URL}" type="text/css" rel="stylesheet">
+  <base href="/">
 </head>
 <body
   class="#VAR{THEME_MODE} mod-windows is-frameless is-maximized is-hidden-frameless obsidian-app show-inline-title show-view-header"
