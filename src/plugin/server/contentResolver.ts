@@ -1,4 +1,4 @@
-import { INTERNAL_CSS_ENPOINT } from './pathResolver';
+import { INTERNAL_CSS_ENPOINT, INTERNAL_LOGIN_ENPOINT } from './pathResolver';
 import HtmlServerPlugin from 'plugin/main';
 import { CustomMarkdownRenderer } from 'plugin/markdownRenderer/customMarkdownRenderer';
 import mime from 'mime-types';
@@ -26,7 +26,7 @@ export const contentResolver = async (
       payload: fullCssText,
     };
   }
-  if (path == INTERNAL_CSS_ENPOINT) {
+  if (path == INTERNAL_LOGIN_ENPOINT) {
     const loginForm = parseHtmlVariables(
       `<!DOCTYPE html>
 <html lang="en">
