@@ -100,6 +100,7 @@ Working! --> [*]
 
 - [x]  Canvas
 ![[test.canvas]]
-- [ ] File resolver
+
+- [x] File resolver
 [[teST]]
 
