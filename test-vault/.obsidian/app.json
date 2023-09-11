@@ -1,5 +1,6 @@
 {
   "defaultViewMode": "source",
   "showInlineTitle": true,
-  "livePreview": true
+  "livePreview": true,
+  "alwaysUpdateLinks": true
 }
