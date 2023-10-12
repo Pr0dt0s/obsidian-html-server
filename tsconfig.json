@@ -5,6 +5,7 @@
     "module": "ESNext",
     "target": "ESNext",
     "allowJs": false,
+    "types": ["puppeteer", "jest-environment-puppeteer", "expect-puppeteer"],
     "strict": true,
     "removeComments": true,
     "noImplicitAny": true,
