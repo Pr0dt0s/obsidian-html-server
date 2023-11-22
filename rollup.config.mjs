@@ -5,6 +5,8 @@ import copy from 'rollup-plugin-copy';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 
+const name = 'html-server';
+
 const developmentConfig = {
   input: 'src/plugin/main.ts',
   external: ['obsidian'],
@@ -13,7 +15,7 @@ const developmentConfig = {
     sourcemap: false,
     format: 'cjs',
     exports: 'default',
-    name: 'Html Server',
+    name,
   },
   plugins: [
     json(),
@@ -44,7 +46,7 @@ const productionConfig = {
     sourcemapExcludeSources: true,
     format: 'cjs',
     exports: 'default',
-    name: 'Html Server',
+    name,
   },
   plugins: [
     json(),
