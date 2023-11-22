@@ -3,9 +3,7 @@ tags: Test File, development
 htmlvars:
   LANG: en
   HTML_TITLE: Custom Tab Title!
-  RENDERED_CONTENT_FILE_NAME: '<div style="position= sticky; padding:10;
-    background-color: #a455a1; top: 10px; width: 100%;"> Custom File Name
-    Content from FrontMatter! </div>'
+  RENDERED_CONTENT_FILE_NAME: '<div style="position= sticky; padding:10; background-color: #a455a1; top: 10px; width: 100%;"> Custom File Name Content from FrontMatter! </div>'
 ---
 # Current Working Features
   
@@ -103,4 +101,5 @@ Working! --> [*]
 
 - [x] File resolver
 [[teST]]
+[[file resolver test]]
 

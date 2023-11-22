@@ -7,7 +7,7 @@ dist
 main.js
 # obsidian
 data.json
-
+.env
 # Exclude sourcemaps
 *.map
 
