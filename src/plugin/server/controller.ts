@@ -19,9 +19,7 @@ export class ServerController {
   constructor(private plugin: HtmlServerPlugin) {
     this.app = express();
 
-    this.app.use(
-      expressSession({ secret: randomBytes(16).toString('base64') })
-    );
+    this.app.use(expressSession({ secret: randomBytes(16).toString('base64') }));
     this.app.use(passport.initialize());
     this.app.use(passport.session());
 
@@ -37,10 +35,7 @@ export class ServerController {
 
     passport.use(
       new LocalStrategy((username, password, done) => {
-        if (
-          username === this.plugin.settings.simpleAuthUsername &&
-          password === this.plugin.settings.simpleAuthPassword
-        ) {
+        if (username === this.plugin.settings.simpleAuthUsername && password === this.plugin.settings.simpleAuthPassword) {
           done(null, { username });
           return;
         }
@@ -71,17 +66,12 @@ export class ServerController {
       }
 
       if (!('/' + resolvedPath === path || resolvedPath === path)) {
-        res.redirect(resolvedPath);
+        res.redirect('/' + resolvedPath);
         res.end();
         return;
       }
 
-      const r = await contentResolver(
-        path,
-        resolveFromPath,
-        this.plugin,
-        this.markdownRenderer
-      );
+      const r = await contentResolver(path, resolveFromPath, this.plugin, this.markdownRenderer);
 
       if (!r) {
         res.status(404).write(`Error reading file at path '${req.path}'`);
@@ -97,18 +87,12 @@ export class ServerController {
 
   async start() {
     if (!this.server || !this.server.listening) {
-      this.server = await new Promise<
-        Server<typeof IncomingMessage, typeof ServerResponse> | undefined
-      >((resolve) => {
+      this.server = await new Promise<Server<typeof IncomingMessage, typeof ServerResponse> | undefined>((resolve) => {
         try {
           if (this.server?.listening) return resolve(this.server);
-          const server = this.app.listen(
-            this.plugin.settings.port,
-            this.plugin.settings.hostname,
-            () => {
-              resolve(server);
-            }
-          );
+          const server = this.app.listen(this.plugin.settings.port, this.plugin.settings.hostname, () => {
+            resolve(server);
+          });
         } catch (error) {
           console.error('error trying to start the server', error);
           resolve(undefined);
@@ -147,30 +131,23 @@ export class ServerController {
 
     const path = tryResolveFilePath(req.path, resolveFromPath, this.plugin.app);
 
-    if (path && [`.css`, `.ico`].find((ext) => path.endsWith(ext)))
-      return next();
+    if (path && [`.css`, `.ico`].find((ext) => path.endsWith(ext))) return next();
 
     const nonce = randomBytes(32).toString('base64');
 
     res.contentType('text/html; charset=UTF-8');
     res.setHeader('Content-Security-Policy', `script-src 'nonce-${nonce}'`);
 
-    const content = await contentResolver(
-      INTERNAL_LOGIN_ENPOINT,
-      '/',
-      this.plugin,
-      this.markdownRenderer,
-      [
-        {
-          varName: 'REDIRECT_URL',
-          varValue: req.url,
-        },
-        {
-          varName: 'NONCE',
-          varValue: nonce,
-        },
-      ]
-    );
+    const content = await contentResolver(INTERNAL_LOGIN_ENPOINT, '/', this.plugin, this.markdownRenderer, [
+      {
+        varName: 'REDIRECT_URL',
+        varValue: req.url,
+      },
+      {
+        varName: 'NONCE',
+        varValue: nonce,
+      },
+    ]);
 
     res.send(content?.payload);
   };

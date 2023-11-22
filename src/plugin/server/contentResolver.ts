@@ -114,7 +114,7 @@ export const contentResolver = async (
         xhttp.open("POST", "/login", true);
         xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         
-        xhttp.send(\`username=\${username}&password=\${password}\`);
+        xhttp.send(\`username=\${encodeURIComponent(username)}&password=\${encodeURIComponent(password)}\`);
       }
       catch (err){
         error.innerText = 'Something went wrong.';
@@ -190,86 +190,6 @@ export const contentResolver = async (
   };
 };
 
-//   if (requestedUrl == '/') {
-//     const data = parseHtmlVariables(
-//       plugin.settings.indexHtml || '<html></html>',
-//       [
-//         ...plugin.settings.htmlReplaceableVariables,
-//         {
-//           varName: 'RENDERED_CONTENT_FILE_NAME',
-//           varValue: 'No file loaded...',
-//         },
-//         {
-//           varName: 'RENDERED_CONTENT',
-//           varValue: '',
-//         },
-//         {
-//           varName: 'THEME_MODE',
-//           varValue: document.body.classList.contains('theme-dark')
-//             ? 'theme-dark'
-//             : 'theme-light',
-//         },
-//       ]
-//     );
-
-//     return {
-//       contentType: 'text/html; charset=UTF-8',
-//       payload: data,
-//     };
-//   } else {
-
-//     // const file = plugin.app.vault.getFiles().find((file) => {
-//     //   return (
-//     //     '/' + file.path == requestedUrl ||
-//     //     '/' + file.path == requestedUrl + '.md'
-//     //   );
-//     // });
-
-//     if (file?.extension && file.extension === 'md') {
-//       const frontmatterVariables = await readFrontmatter(
-//         file,
-//         plugin.app
-//       );
-//       const markdown = await file.vault.read(file);
-//       const renderedMarkdown =
-//         await markdownRenderer.renderHtmlFromMarkdown(markdown);
-//       return {
-//         contentType: 'text/html',
-//         payload: parseHtmlVariables(
-//           plugin.settings.indexHtml || '<html></html>',
-//           [
-//             {
-//               varName: 'RENDERED_CONTENT_FILE_NAME',
-//               varValue: file.basename,
-//             },
-//             {
-//               varName: 'THEME_MODE',
-//               varValue: document.body.classList.contains('theme-dark')
-//                 ? 'theme-dark'
-//                 : 'theme-light',
-//             },
-//             {
-//               varName: 'RENDERED_CONTENT',
-//               varValue: renderedMarkdown,
-//             },
-//             ...plugin.settings.htmlReplaceableVariables,
-//             ...frontmatterVariables,
-//           ]
-//         ),
-//       };
-//     } else if (file) {
-//       const payload = await plugin.app.vault.readBinary(file);
-
-//       return {
-//         contentType: mime.lookup(file.extension) || 'text',
-//         payload: Buffer.from(payload),
-//       };
-//     }
-//   }
-
-//   return null;
-// };
-
 async function readFrontmatter(file: TFile, app: App) {
   return new Promise<{ varName: string; varValue: string }[]>((resolve) => {
     app.fileManager
@@ -305,11 +225,19 @@ function parseHtmlVariables(
   _htmlVariables.forEach(({ varName, varValue }) => {
     varMap.set(varName, varValue);
   });
-  return html.replace(/(#VAR{(\S+)})/g, (_substring, _group1, variableName) => {
-    let output = variableName;
-    if (varMap.has(variableName)) {
-      output = varMap.get(variableName);
-    }
-    return output;
-  });
+  return html
+    .replace(/(#VAR{(\S+)})/g, (_substring, _group1, variableName) => {
+      let output = variableName;
+      if (varMap.has(variableName)) {
+        output = varMap.get(variableName);
+      }
+      return output;
+    })
+    .replace(/(\[(\S+)\])/g, (_substring, _group1, variableName) => {
+      let output = variableName;
+      if (varMap.has(variableName)) {
+        output = varMap.get(variableName);
+      }
+      return output;
+    });
 }
