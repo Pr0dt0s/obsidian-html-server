@@ -83,3 +83,8 @@ And in the html template you would use it like this:
 ![/assets/rendered_example.png](/assets/rendered_example.png)
 
 </details>
+
+---
+<br>
+
+<a href="https://www.buymeacoffee.com/pr0dt0s"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=pr0dt0s&button_colour=5F7FFF&font_colour=ffffff&font_family=Poppins&outline_colour=000000&coffee_colour=FFDD00" /></a>
