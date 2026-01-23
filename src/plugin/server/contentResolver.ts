@@ -152,7 +152,14 @@ export const contentResolver = async (
   console.log(file.path, file.name);
 
   if (file.extension === 'md') {
-    const frontmatterVariables = await readFrontmatter(file, plugin.app);
+    const frontmatterData = await readFrontmatter(file, plugin.app);
+    console.log('[HTML-Server] frontmatterData:', JSON.stringify(frontmatterData, null, 2));
+    // 使用文件名作为页面标题
+    const pageTitle = file.basename;
+    console.log('[HTML-Server] pageTitle:', pageTitle);
+
+    // 生成 frontmatter 属性的 HTML 表格
+    const frontmatterHtml = generateFrontmatterHtml(frontmatterData.rawFrontmatter);
     const markdown = await file.vault.read(file);
     const renderedMarkdown = await markdownRenderer.renderHtmlFromMarkdown(
       markdown
@@ -177,7 +184,16 @@ export const contentResolver = async (
             varValue: renderedMarkdown,
           },
           ...plugin.settings.htmlReplaceableVariables,
-          ...frontmatterVariables,
+          // 文件标题优先级高于设置中的默认值，但低于 frontmatter 中的 htmlvars
+          {
+            varName: 'HTML_TITLE',
+            varValue: pageTitle,
+          },
+          {
+            varName: 'FRONTMATTER_HTML',
+            varValue: frontmatterHtml,
+          },
+          ...frontmatterData.variables,
         ]
       ),
     };
@@ -190,14 +206,44 @@ export const contentResolver = async (
   };
 };
 
-async function readFrontmatter(file: TFile, app: App) {
-  return new Promise<{ varName: string; varValue: string }[]>((resolve) => {
+async function readFrontmatter(file: TFile, app: App): Promise<{
+  variables: { varName: string; varValue: string }[];
+  rawFrontmatter: Record<string, unknown>;
+  title?: string;
+}> {
+  console.log('[HTML-Server] readFrontmatter called for file:', file.path);
+  return new Promise((resolve) => {
     app.fileManager
       .processFrontMatter(file, (frontMatter) => {
+        console.log('[HTML-Server] Raw frontMatter:', JSON.stringify(frontMatter, null, 2));
         const parsedVariables: { varName: string; varValue: string }[] = [];
+        const rawFrontmatter: Record<string, unknown> = {};
+        let title: string | undefined;
 
         Object.entries(frontMatter || {}).forEach(([key, value]) => {
-          if (typeof value === 'object') return;
+          // 跳过 htmlvars，它是特殊处理的
+          if (key === 'htmlvars') return;
+
+          // 保存原始数据用于 HTML 生成
+          rawFrontmatter[key] = value;
+
+          // Track title for HTML_TITLE
+          if (key === 'title' && typeof value === 'string') {
+            title = value;
+          }
+
+          // Handle arrays by joining them (用于模板变量替换)
+          if (Array.isArray(value)) {
+            parsedVariables.push({
+              varName: 'FM:' + key,
+              varValue: value.map((v) => String(v)).join(', '),
+            });
+            return;
+          }
+
+          // Skip non-array objects (but allow null)
+          if (typeof value === 'object' && value !== null) return;
+
           parsedVariables.push({
             varName: 'FM:' + key,
             varValue: String(value),
@@ -207,14 +253,71 @@ async function readFrontmatter(file: TFile, app: App) {
         Object.entries(frontMatter.htmlvars || {}).forEach(([key, value]) => {
           parsedVariables.push({ varName: key, varValue: String(value) });
         });
-        resolve(parsedVariables);
+
+        console.log('[HTML-Server] Final parsed variables count:', parsedVariables.length);
+        resolve({ variables: parsedVariables, rawFrontmatter, title });
       })
       .catch((error) => {
-        console.error('Error Parsing Frontmatter');
-        console.error(error);
-        resolve([]);
+        console.error('[HTML-Server] Error Parsing Frontmatter:', error);
+        resolve({ variables: [], rawFrontmatter: {}, title: undefined });
       });
   });
+}
+
+// 生成 frontmatter 属性的 HTML
+function generateFrontmatterHtml(
+  rawFrontmatter: Record<string, unknown>
+): string {
+  const entries = Object.entries(rawFrontmatter);
+
+  if (entries.length === 0) {
+    return '';
+  }
+
+  // 生成 HTML 表格
+  const rows = entries
+    .map(([key, value]) => {
+      let valueHtml: string;
+
+      if (Array.isArray(value)) {
+        // 数组渲染为无序列表
+        const listItems = value
+          .map((item) => `<li>${escapeHtml(String(item))}</li>`)
+          .join('');
+        valueHtml = `<ul class="frontmatter-list">${listItems}</ul>`;
+      } else if (value === null || value === undefined) {
+        valueHtml = '<span class="frontmatter-empty">-</span>';
+      } else {
+        valueHtml = escapeHtml(String(value));
+      }
+
+      return `<tr><td class="frontmatter-key">${escapeHtml(key)}</td><td class="frontmatter-value">${valueHtml}</td></tr>`;
+    })
+    .join('\n');
+
+  return `<div class="frontmatter-container">
+<div class="frontmatter-toggle">
+  <span class="frontmatter-toggle-icon">▼</span>
+  <span>Properties (${entries.length})</span>
+</div>
+<div class="frontmatter-content">
+  <table class="frontmatter-table">
+  <tbody>
+  ${rows}
+  </tbody>
+  </table>
+</div>
+</div>`;
+}
+
+// HTML 转义
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function parseHtmlVariables(
