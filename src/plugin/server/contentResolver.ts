@@ -3,7 +3,7 @@ import HtmlServerPlugin from 'plugin/main';
 import { CustomMarkdownRenderer } from 'plugin/markdownRenderer/customMarkdownRenderer';
 import mime from 'mime-types';
 import { ReplaceableVariables } from 'plugin/settings/settings';
-import { App, TFile } from 'obsidian';
+import { App, TFile, TFolder } from 'obsidian';
 
 export const contentResolver = async (
   path: string,
@@ -364,4 +364,208 @@ function parseHtmlVariables(
       }
       return output;
     });
+}
+
+// Format date for directory listing
+function formatDate(timestamp: number): string {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+// Generate breadcrumb navigation HTML
+function generateBreadcrumb(currentPath: string): string {
+  if (!currentPath || currentPath === '/') {
+    return '<nav class="directory-breadcrumb"><span>Home</span></nav>';
+  }
+
+  const pathWithoutLeadingSlash = currentPath.startsWith('/') ? currentPath.substring(1) : currentPath;
+  const parts = pathWithoutLeadingSlash.split('/').filter(p => p);
+
+  let breadcrumbHtml = '<nav class="directory-breadcrumb"><a href="/">Home</a>';
+  let accumulatedPath = '';
+
+  for (let i = 0; i < parts.length; i++) {
+    accumulatedPath += '/' + encodeURIComponent(parts[i]);
+    if (i === parts.length - 1) {
+      // Last item - not a link
+      breadcrumbHtml += ` / <span>${escapeHtml(parts[i])}</span>`;
+    } else {
+      breadcrumbHtml += ` / <a href="${accumulatedPath}">${escapeHtml(parts[i])}</a>`;
+    }
+  }
+
+  breadcrumbHtml += '</nav>';
+  return breadcrumbHtml;
+}
+
+// Generate directory listing HTML
+export function generateDirectoryListingHtml(
+  folder: TFolder,
+  currentPath: string,
+  plugin: HtmlServerPlugin
+): { contentType: string; payload: string } {
+  const themeMode = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
+  const isRoot = !currentPath || currentPath === '/' || currentPath === '';
+
+  // Sort children: folders first, then files, both alphabetically
+  const children = folder.children.slice().sort((a, b) => {
+    const aIsFolder = a instanceof TFolder;
+    const bIsFolder = b instanceof TFolder;
+    if (aIsFolder && !bIsFolder) return -1;
+    if (!aIsFolder && bIsFolder) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  // Build file list rows
+  let tableRows = '';
+
+  // Add parent folder link if not root
+  if (!isRoot) {
+    tableRows += '<tr><td class="directory-name"><a href="..">../</a></td><td class="directory-date">-</td></tr>\n';
+  }
+
+  // Add folder and file entries
+  for (const child of children) {
+    const isFolder = child instanceof TFolder;
+    const icon = isFolder ? '📁' : '📄';
+    const name = isFolder ? child.name + '/' : child.name;
+    const href = '/' + encodeURIComponent(child.path).replace(/%2F/g, '/');
+
+    let dateStr = '-';
+    if (child instanceof TFile) {
+      dateStr = formatDate(child.stat.mtime);
+    } else if (child instanceof TFolder && child.children.length > 0) {
+      // For folders, we could show the most recent modification of children
+      // But for simplicity, just show "-"
+      dateStr = '-';
+    }
+
+    tableRows += `<tr><td class="directory-name">${icon} <a href="${href}">${escapeHtml(name)}</a></td><td class="directory-date">${dateStr}</td></tr>\n`;
+  }
+
+  // Handle empty folder
+  if (children.length === 0 && isRoot) {
+    tableRows = '<tr><td colspan="2" class="directory-empty">This folder is empty</td></tr>';
+  } else if (children.length === 0) {
+    tableRows = '<tr><td class="directory-name"><a href="..">../</a></td><td class="directory-date">-</td></tr>\n';
+    tableRows += '<tr><td colspan="2" class="directory-empty">This folder is empty</td></tr>';
+  }
+
+  const displayPath = currentPath || '/';
+  const breadcrumb = generateBreadcrumb(currentPath);
+  const pageTitle = isRoot ? 'Index of /' : `Index of /${folder.path}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>${escapeHtml(pageTitle)}</title>
+  <link rel="shortcut icon" href="${plugin.settings.htmlReplaceableVariables.find(v => v.varName === 'FAVICON_URL')?.varValue || '//obsidian.md/favicon.ico'}">
+  <link href="${plugin.settings.htmlReplaceableVariables.find(v => v.varName === 'CSS_FILE_URL')?.varValue || '/.obsidian/plugins/obsidian-http-server/app.css'}" type="text/css" rel="stylesheet">
+  <style>
+    .directory-listing {
+      max-width: 80%;
+      margin: 2em auto;
+      padding: 1em;
+    }
+    .directory-breadcrumb {
+      margin-bottom: 1.5em;
+      padding: 0.5em 0;
+      font-size: 1.1em;
+      color: var(--text-muted);
+    }
+    .directory-breadcrumb a {
+      color: var(--text-accent);
+      text-decoration: none;
+    }
+    .directory-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .directory-breadcrumb span {
+      color: var(--text-normal);
+    }
+    .directory-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .directory-table th {
+      text-align: left;
+      padding: 0.75em 1em;
+      border-bottom: 2px solid var(--background-modifier-border);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .directory-table td {
+      padding: 0.5em 1em;
+      border-bottom: 1px solid var(--background-modifier-border);
+    }
+    .directory-table tr:hover {
+      background-color: var(--background-modifier-hover);
+    }
+    .directory-name a {
+      color: var(--text-accent);
+      text-decoration: none;
+    }
+    .directory-name a:hover {
+      text-decoration: underline;
+    }
+    .directory-date {
+      color: var(--text-muted);
+      white-space: nowrap;
+      width: 180px;
+    }
+    .directory-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 2em !important;
+    }
+    h1 {
+      color: var(--text-normal);
+      margin-bottom: 0.5em;
+    }
+  </style>
+</head>
+<body class="${themeMode} mod-windows is-frameless is-maximized is-hidden-frameless obsidian-app" style="--zoom-factor:1; --font-text-size:16px;">
+  <div class="app-container">
+    <div class="horizontal-main-container">
+      <div class="workspace">
+        <div class="workspace-split mod-vertical mod-root">
+          <div class="workspace-tabs mod-top mod-top-left-space mod-top-right-space">
+            <div class="workspace-tab-container">
+              <div class="workspace-leaf">
+                <div class="workspace-leaf-content">
+                  <div class="view-content">
+                    <div class="directory-listing">
+                      <h1>${escapeHtml(pageTitle)}</h1>
+                      ${breadcrumb}
+                      <table class="directory-table">
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Modified</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${tableRows}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  return {
+    contentType: 'text/html',
+    payload: html,
+  };
 }

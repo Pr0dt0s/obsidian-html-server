@@ -16,6 +16,7 @@ export type PluginSettings = {
   simpleAuthPassword: string;
   useDynamicTitle: boolean;
   showFrontmatterProperties: boolean;
+  enableDirectoryListing: boolean;
 };
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -178,4 +179,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   simpleAuthPassword: randomBytes(8).toString('hex'),
   useDynamicTitle: true,
   showFrontmatterProperties: true,
+  enableDirectoryListing: true,
 };

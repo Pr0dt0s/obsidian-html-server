@@ -252,6 +252,19 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
         });
       });
 
+    new Setting(advancedSettings)
+      .setName('Enable directory listing')
+      .setDesc(
+        'When enabled, accessing a folder path displays its contents as a browsable list.'
+      )
+      .addToggle((cb) => {
+        cb.setValue(this.plugin.settings.enableDirectoryListing);
+        cb.onChange(async (value) => {
+          this.plugin.settings.enableDirectoryListing = value;
+          await this.saveAndReload();
+        });
+      });
+
     /* const _htmlSettingItem =  */ new Setting(advancedSettings)
       .setName('Custom index.html file.')
       .addExtraButton((cb) => {
