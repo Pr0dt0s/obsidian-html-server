@@ -273,12 +273,19 @@ Response sent to browser
 
 | Variable | Description |
 |----------|-------------|
-| `RENDERED_CONTENT_FILE_NAME` | Current file name |
+| `RENDERED_CONTENT_FILE_NAME` | Current file name (basename) |
 | `RENDERED_CONTENT` | Rendered markdown HTML |
 | `THEME_MODE` | `theme-dark` or `theme-light` |
 | `FAVICON_URL` | Icon URL |
-| `HTML_TITLE` | Page title |
+| `HTML_TITLE` | Page title (defaults to file basename, can be overridden) |
 | `CSS_FILE_URL` | Stylesheet URL |
+| `FRONTMATTER_HTML` | Auto-generated collapsible HTML table with all YAML properties |
+
+### Frontmatter Array Support
+
+Arrays in frontmatter are now fully supported:
+- For template variables (`FM:*`): Arrays are converted to comma-separated strings
+- For `FRONTMATTER_HTML`: Arrays are rendered as unordered lists (`<ul><li>...</li></ul>`)
 
 ### Frontmatter Example
 ```yaml

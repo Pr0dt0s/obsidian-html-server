@@ -243,7 +243,8 @@ contentResolver(path, referer, plugin, markdownRenderer, extraVars)
 │   │   │   │   ├─ RENDERED_CONTENT
 │   │   │   │   ├─ THEME_MODE
 │   │   │   │   ├─ FAVICON_URL
-│   │   │   │   ├─ HTML_TITLE
+│   │   │   │   ├─ HTML_TITLE (defaults to file basename)
+│   │   │   │   ├─ FRONTMATTER_HTML (collapsible properties table)
 │   │   │   │   └─ CSS_FILE_URL
 │   │   │   │
 │   │   │   ├─ Settings variables (medium priority)

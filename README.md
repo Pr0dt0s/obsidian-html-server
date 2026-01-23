@@ -58,12 +58,14 @@ htmlvars:
 The `internal variables` used at the moment are:
 
 - RENDERED_CONTENT_FILE_NAME (The file name that is being opened)
-- RENDERED_CONTENT (the whole content of the rendered file)
+- RENDERED_CONTENT (The whole content of the rendered file)
 - THEME_MODE (`theme-dark` or `theme-light` according to your current appearance settings)
+- HTML_TITLE (Page title, defaults to the file's basename)
+- FRONTMATTER_HTML (Auto-generated HTML table displaying all YAML frontmatter properties with a collapsible toggle)
 
 Please take note that you **can** overwrite the `internal variables` either from the settings or from the file's frontmatter.
 
-You can use other frontmatter properties as variables in your templates but they can only be Strings or Numbers and you must prefix `FM:` to the variable name.
+You can use other frontmatter properties as variables in your templates. Strings and Numbers are directly accessible, and **arrays are also supported** (converted to comma-separated strings for template variables, or rendered as unordered lists in FRONTMATTER_HTML). You must prefix `FM:` to the variable name.
 
 Example:
 
