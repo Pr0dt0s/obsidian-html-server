@@ -398,6 +398,19 @@ function generateBreadcrumb(currentPath: string): string {
   return breadcrumbHtml;
 }
 
+// Recursively count all files in a folder (including subfolders)
+function countFilesRecursive(folder: TFolder): number {
+  let count = 0;
+  for (const child of folder.children) {
+    if (child instanceof TFile) {
+      count++;
+    } else if (child instanceof TFolder) {
+      count += countFilesRecursive(child);
+    }
+  }
+  return count;
+}
+
 // Generate directory listing HTML
 export function generateDirectoryListingHtml(
   folder: TFolder,
@@ -421,7 +434,7 @@ export function generateDirectoryListingHtml(
 
   // Add parent folder link if not root
   if (!isRoot) {
-    tableRows += '<tr><td class="directory-name"><a href="..">../</a></td><td class="directory-date">-</td></tr>\n';
+    tableRows += '<tr><td class="directory-name"><a href="..">../</a></td><td class="directory-files">-</td><td class="directory-date">-</td></tr>\n';
   }
 
   // Add folder and file entries
@@ -432,23 +445,25 @@ export function generateDirectoryListingHtml(
     const href = '/' + encodeURIComponent(child.path).replace(/%2F/g, '/');
 
     let dateStr = '-';
+    let filesStr = '-';
+
     if (child instanceof TFile) {
       dateStr = formatDate(child.stat.mtime);
-    } else if (child instanceof TFolder && child.children.length > 0) {
-      // For folders, we could show the most recent modification of children
-      // But for simplicity, just show "-"
-      dateStr = '-';
+    } else if (child instanceof TFolder) {
+      // Count all files recursively for folders
+      const fileCount = countFilesRecursive(child);
+      filesStr = String(fileCount);
     }
 
-    tableRows += `<tr><td class="directory-name">${icon} <a href="${href}">${escapeHtml(name)}</a></td><td class="directory-date">${dateStr}</td></tr>\n`;
+    tableRows += `<tr><td class="directory-name">${icon} <a href="${href}">${escapeHtml(name)}</a></td><td class="directory-files">${filesStr}</td><td class="directory-date">${dateStr}</td></tr>\n`;
   }
 
   // Handle empty folder
   if (children.length === 0 && isRoot) {
-    tableRows = '<tr><td colspan="2" class="directory-empty">This folder is empty</td></tr>';
+    tableRows = '<tr><td colspan="3" class="directory-empty">This folder is empty</td></tr>';
   } else if (children.length === 0) {
-    tableRows = '<tr><td class="directory-name"><a href="..">../</a></td><td class="directory-date">-</td></tr>\n';
-    tableRows += '<tr><td colspan="2" class="directory-empty">This folder is empty</td></tr>';
+    tableRows = '<tr><td class="directory-name"><a href="..">../</a></td><td class="directory-files">-</td><td class="directory-date">-</td></tr>\n';
+    tableRows += '<tr><td colspan="3" class="directory-empty">This folder is empty</td></tr>';
   }
 
   const displayPath = currentPath || '/';
@@ -510,6 +525,11 @@ export function generateDirectoryListingHtml(
     .directory-name a:hover {
       text-decoration: underline;
     }
+    .directory-files {
+      color: var(--text-muted);
+      text-align: center;
+      width: 80px;
+    }
     .directory-date {
       color: var(--text-muted);
       white-space: nowrap;
@@ -544,6 +564,7 @@ export function generateDirectoryListingHtml(
                         <thead>
                           <tr>
                             <th>Name</th>
+                            <th>Files</th>
                             <th>Modified</th>
                           </tr>
                         </thead>
