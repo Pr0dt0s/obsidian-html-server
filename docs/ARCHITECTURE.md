@@ -173,6 +173,8 @@ abstract renderHtmlFromMarkdown(markdown: string): Promise<string>
   useSimpleAuth: boolean                // Enable auth
   simpleAuthUsername: string
   simpleAuthPassword: string
+  useDynamicTitle: boolean              // Use file name as page title
+  showFrontmatterProperties: boolean    // Show frontmatter properties panel
 }
 ```
 

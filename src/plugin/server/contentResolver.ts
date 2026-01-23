@@ -154,47 +154,68 @@ export const contentResolver = async (
   if (file.extension === 'md') {
     const frontmatterData = await readFrontmatter(file, plugin.app);
     console.log('[HTML-Server] frontmatterData:', JSON.stringify(frontmatterData, null, 2));
-    // 使用文件名作为页面标题
-    const pageTitle = file.basename;
-    console.log('[HTML-Server] pageTitle:', pageTitle);
 
-    // 生成 frontmatter 属性的 HTML 表格
-    const frontmatterHtml = generateFrontmatterHtml(frontmatterData.rawFrontmatter);
+    // Build internal variables list
+    const internalVariables: { varName: string; varValue: string }[] = [
+      {
+        varName: 'RENDERED_CONTENT_FILE_NAME',
+        varValue: file.basename,
+      },
+      {
+        varName: 'THEME_MODE',
+        varValue: document.body.classList.contains('theme-dark')
+          ? 'theme-dark'
+          : 'theme-light',
+      },
+    ];
+
     const markdown = await file.vault.read(file);
     const renderedMarkdown = await markdownRenderer.renderHtmlFromMarkdown(
       markdown
     );
+
+    internalVariables.push({
+      varName: 'RENDERED_CONTENT',
+      varValue: renderedMarkdown,
+    });
+
+    // Add settings variables
+    const allVariables = [
+      ...internalVariables,
+      ...plugin.settings.htmlReplaceableVariables,
+    ];
+
+    // Dynamic title: use file basename (higher priority than settings default)
+    if (plugin.settings.useDynamicTitle) {
+      allVariables.push({
+        varName: 'HTML_TITLE',
+        varValue: file.basename,
+      });
+    }
+
+    // Frontmatter properties panel
+    if (plugin.settings.showFrontmatterProperties) {
+      const frontmatterHtml = generateFrontmatterHtml(frontmatterData.rawFrontmatter);
+      allVariables.push({
+        varName: 'FRONTMATTER_HTML',
+        varValue: frontmatterHtml,
+      });
+    } else {
+      // Empty string to remove the placeholder from template
+      allVariables.push({
+        varName: 'FRONTMATTER_HTML',
+        varValue: '',
+      });
+    }
+
+    // Frontmatter variables have highest priority
+    allVariables.push(...frontmatterData.variables);
+
     return {
       contentType: 'text/html',
       payload: parseHtmlVariables(
         plugin.settings.indexHtml || '<html></html>',
-        [
-          {
-            varName: 'RENDERED_CONTENT_FILE_NAME',
-            varValue: file.basename,
-          },
-          {
-            varName: 'THEME_MODE',
-            varValue: document.body.classList.contains('theme-dark')
-              ? 'theme-dark'
-              : 'theme-light',
-          },
-          {
-            varName: 'RENDERED_CONTENT',
-            varValue: renderedMarkdown,
-          },
-          ...plugin.settings.htmlReplaceableVariables,
-          // 文件标题优先级高于设置中的默认值，但低于 frontmatter 中的 htmlvars
-          {
-            varName: 'HTML_TITLE',
-            varValue: pageTitle,
-          },
-          {
-            varName: 'FRONTMATTER_HTML',
-            varValue: frontmatterHtml,
-          },
-          ...frontmatterData.variables,
-        ]
+        allVariables
       ),
     };
   }

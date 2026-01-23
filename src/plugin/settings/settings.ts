@@ -14,6 +14,8 @@ export type PluginSettings = {
   useSimpleAuth: boolean;
   simpleAuthUsername: string;
   simpleAuthPassword: string;
+  useDynamicTitle: boolean;
+  showFrontmatterProperties: boolean;
 };
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -174,4 +176,6 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   useSimpleAuth: false,
   simpleAuthUsername: 'obsidian',
   simpleAuthPassword: randomBytes(8).toString('hex'),
+  useDynamicTitle: true,
+  showFrontmatterProperties: true,
 };

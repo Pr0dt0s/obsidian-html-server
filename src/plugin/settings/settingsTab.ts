@@ -226,6 +226,32 @@ export class HtmlServerPluginSettingsTab extends PluginSettingTab {
       });
     });
 
+    new Setting(advancedSettings)
+      .setName('Use dynamic page title')
+      .setDesc(
+        'Use the markdown file name as the page title instead of a fixed value from settings.'
+      )
+      .addToggle((cb) => {
+        cb.setValue(this.plugin.settings.useDynamicTitle);
+        cb.onChange(async (value) => {
+          this.plugin.settings.useDynamicTitle = value;
+          await this.saveAndReload();
+        });
+      });
+
+    new Setting(advancedSettings)
+      .setName('Show frontmatter properties')
+      .setDesc(
+        'Display YAML frontmatter as a collapsible properties panel in the rendered page.'
+      )
+      .addToggle((cb) => {
+        cb.setValue(this.plugin.settings.showFrontmatterProperties);
+        cb.onChange(async (value) => {
+          this.plugin.settings.showFrontmatterProperties = value;
+          await this.saveAndReload();
+        });
+      });
+
     /* const _htmlSettingItem =  */ new Setting(advancedSettings)
       .setName('Custom index.html file.')
       .addExtraButton((cb) => {
