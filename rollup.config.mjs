@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import json from '@rollup/plugin-json';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import cjs from '@rollup/plugin-commonjs';
@@ -7,11 +8,15 @@ import terser from '@rollup/plugin-terser';
 
 const name = 'html-server';
 
+// 环境变量配置输出目录（可在 .env 文件中设置）
+const devOutputDir = process.env.DEV_OUTPUT_DIR || 'test-vault/.obsidian/plugins/html-server';
+const prodOutputDir = process.env.PROD_OUTPUT_DIR || 'dist';
+
 const developmentConfig = {
   input: 'src/plugin/main.ts',
   external: ['obsidian'],
   output: {
-    dir: 'test-vault/.obsidian/plugins/html-server',
+    dir: devOutputDir,
     sourcemap: false,
     format: 'cjs',
     exports: 'default',
@@ -21,16 +26,16 @@ const developmentConfig = {
     json(),
     nodeResolve({ preferBuiltins: true }),
     cjs({ include: 'node_modules/**' }),
-    typescript({ tsconfig: './tsconfig.dev.json' }),
+    typescript({ tsconfig: './tsconfig.dev.json', outDir: devOutputDir }),
     copy({
       targets: [
         {
           src: 'styles.css',
-          dest: 'test-vault/.obsidian/plugins/html-server/',
+          dest: devOutputDir,
         },
         {
           src: 'manifest.json',
-          dest: 'test-vault/.obsidian/plugins/html-server/',
+          dest: devOutputDir,
         },
       ],
     }),
@@ -41,7 +46,7 @@ const productionConfig = {
   input: 'src/plugin/main.ts',
   external: ['obsidian'],
   output: {
-    dir: 'dist',
+    dir: prodOutputDir,
     sourcemap: false,
     sourcemapExcludeSources: true,
     format: 'cjs',
@@ -52,16 +57,16 @@ const productionConfig = {
     json(),
     nodeResolve({ preferBuiltins: true }),
     cjs({ include: 'node_modules/**' }),
-    typescript({ tsconfig: './tsconfig.json' }),
+    typescript({ tsconfig: './tsconfig.json', outDir: prodOutputDir }),
     copy({
       targets: [
         {
           src: 'styles.css',
-          dest: 'dist/',
+          dest: prodOutputDir,
         },
         {
           src: 'manifest.json',
-          dest: 'dist/',
+          dest: prodOutputDir,
         },
       ],
     }),

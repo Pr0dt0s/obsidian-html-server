@@ -8,8 +8,8 @@ import { ObsidianMarkdownRenderer } from '../markdownRenderer/obsidianMarkdownRe
 import * as passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { randomBytes } from 'crypto';
-import { INTERNAL_LOGIN_ENPOINT, tryResolveFilePath } from './pathResolver';
-import { contentResolver } from './contentResolver';
+import { INTERNAL_LOGIN_ENPOINT, tryResolveFilePath, resolvePathWithType } from './pathResolver';
+import { contentResolver, generateDirectoryListingHtml } from './contentResolver';
 
 export class ServerController {
   app: express.Application;
@@ -51,12 +51,45 @@ export class ServerController {
 
     this.app.use('/', this.authenticateIfNeeded, async (req, res) => {
       let path = decodeURI(req.path);
-      if (!path || path === '/') {
-        path = '/' + plugin.settings.defaultFile;
-      }
-
       const resolveFromPath = getResolveFromPath(req);
 
+      // Check if we should handle as directory listing for root
+      if (!path || path === '/') {
+        // If default file is set, try to use it
+        if (plugin.settings.defaultFile) {
+          path = '/' + plugin.settings.defaultFile;
+        } else if (plugin.settings.enableDirectoryListing) {
+          // No default file and directory listing enabled - show root listing
+          const resolution = resolvePathWithType('/', resolveFromPath, app);
+          if (resolution && resolution.type === 'folder') {
+            const r = generateDirectoryListingHtml(resolution.folder, '', this.plugin);
+            res.contentType(r.contentType);
+            res.write(r.payload);
+            res.end();
+            return;
+          }
+        }
+      }
+
+      // Try to resolve the path
+      const resolution = resolvePathWithType(path, resolveFromPath, app);
+
+      // Handle folder requests
+      if (resolution && resolution.type === 'folder') {
+        if (plugin.settings.enableDirectoryListing) {
+          const r = generateDirectoryListingHtml(resolution.folder, resolution.path, this.plugin);
+          res.contentType(r.contentType);
+          res.write(r.payload);
+          res.end();
+          return;
+        } else {
+          res.status(404).write(`Directory listing is disabled for path '${req.path}'`);
+          res.end();
+          return;
+        }
+      }
+
+      // Fall back to legacy file resolution for files and special paths
       const resolvedPath = tryResolveFilePath(path, resolveFromPath, app);
 
       if (!resolvedPath) {
